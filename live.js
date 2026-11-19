@@ -7,7 +7,7 @@
  * Что делает в боевом режиме:
  *  • вход/регистрация через Supabase Auth, роли (admin) и баны хранятся в БД;
  *  • каталог, заказы, объявления, чаты, сделки, отзывы, жалобы — в PostgreSQL;
- *  • оплата заказов через платёжного провайдера, доставка с трек-номером;
+ *  • заказы с доставкой и трек-номером (оплату подтверждает менеджер; платёжный провайдер — задел на будущее);
  *  • загрузка фото объявлений в Supabase Storage, модерация объявлений.
  *
  * ВАЖНО: проверки в браузере — только для удобства. Реальная защита — политики RLS и функции в БД
@@ -479,7 +479,7 @@
         if (!need("Войдите, чтобы подать объявление.", openPublish)) return;
         open(head("Подать объявление") + `<form id="pubForm" class="form"><label>Модель телефона<input name="model" required maxlength="40" list="mdl" placeholder="Например, iPhone 15 Pro"></label><datalist id="mdl">${P.map(p => `<option value="${esc(p.name)}">`).join("")}</datalist>
  <label>Память<select name="mem"><option>128 ГБ</option><option selected>256 ГБ</option><option>512 ГБ</option><option>1 ТБ</option></select></label><label>Состояние<select name="cond"><option>Как новое</option><option>Отличное</option><option>Хорошее</option><option>Есть следы использования</option></select></label>
- <label>Здоровье батареи, % (необязательно)<input name="bat" type="number" min="1" max="100"></label><label>Цена, ₸<input name="price" required type="number" min="10000" max="5000000"></label><label>Город<input name="city" required maxlength="30" value="${esc(U.city)}"></label>
+ <label>Здоровье батареи, % (необязательно)<input name="bat" type="number" min="1" max="100"></label><label>Цена, ₸<input name="price" required type="number" min="10000" max="5000000"></label><label>Город<input name="city" required maxlength="30" placeholder="Например, Алматы" value="${esc(U.city && U.city !== 'Казахстан' ? U.city : '')}"></label>
  <label class="full">Фото (до 5 шт., JPG / PNG / WebP)<input name="files" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><label class="full">Описание<textarea name="note" maxlength="300" placeholder="Комплект, состояние, что менялось…"></textarea></label>
  <p class="note full">Объявление появится в ленте после проверки модератором. Из фото удаляются метаданные (геолокация).</p><button class="btn primary full">Отправить на модерацию</button></form>`);
     };
@@ -653,7 +653,7 @@
         const closed = o => ["cancelled", "refunded"].includes(o.status);
         const l = ORD.filter(o => of === "all" || (of === "closed" ? closed(o) : o.status === of)).sort((a, c) => c.ts - a.ts);
         const rev = ORD.filter(o => ["paid", "shipped", "delivered"].includes(o.status)).reduce((n, o) => n + o.total, 0);
-        b.innerHTML = `<section><h2>Заказы</h2><p class="sub">Оплата подтверждается автоматически через платёжного провайдера. Проверьте заказ, отправьте и укажите трек-номер.</p>
+        b.innerHTML = `<section><h2>Заказы</h2><p class="sub">${isManual() ? "Оплату подтверждает менеджер вручную: проверьте заказ, нажмите «Подтвердить оплату», затем отправьте и укажите трек-номер." : "Оплата подтверждается автоматически через платёжного провайдера. Проверьте заказ, отправьте и укажите трек-номер."}</p>
  <div class="stats">${sbox(ORD.length, "всего заказов")}${sbox(ORD.filter(o => o.status === "paid").length, "ждут отправки")}${sbox(money(rev), "оплачено (без отмен)")}</div>
  ${fbar("ofil", of, [["all", "Все"], ["paid", "Ждут отправки"], ["shipped", "В пути"], ["delivered", "Доставлены"], ["pending_payment", "Не оплачены"], ["closed", "Отменённые"]])}
  ${l.length ? l.map(o => `<div class="ar glass"><div class="g"><b>№${o.id}</b> · ${esc(o.name)}<div class="note">${dt(o.ts)} · ${DLV[o.delivery] || ""} · ${esc(o.country)} · ${o.items.reduce((n, i) => n + i.qty, 0)} шт.</div></div>${chip(o.status)}<b>${money(o.total)}</b><button class="btn" data-a="oopen" data-id="${o.id}">Открыть</button></div>`).join("") : `<div class="empty">Заказов нет.</div>`}</section>`;

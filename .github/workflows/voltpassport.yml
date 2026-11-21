@@ -1,0 +1,26 @@
+name: VoltPassport checks
+on:
+  push:
+    branches: [feature/voltpassport-v1]
+  pull_request:
+    paths:
+      - 'passport-*.js'
+      - 'voltpassport.*'
+      - 'tests/voltpassport-core.test.cjs'
+      - '.github/workflows/voltpassport.yml'
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check passport-core.js
+          node --check passport-app.js
+      - name: Domain unit tests
+        run: node --test tests/voltpassport-core.test.cjs

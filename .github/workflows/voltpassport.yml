@@ -6,6 +6,7 @@ on:
       - feature/voltstore-universal-inspections
       - feature/voltguide-ai-assistant
       - feature/voltmarket-unified-flow
+      - feature/voltdeal-buying-flow
   pull_request:
     paths:
       - 'passport-*.js'
@@ -13,6 +14,7 @@ on:
       - 'voltcheck-all.*'
       - 'voltguide*'
       - 'market*'
+      - 'voltdeal*'
       - 'passport-app.js'
       - 'index.html'
       - 'netlify/functions/voltguide-ai.mjs'
@@ -37,6 +39,8 @@ jobs:
           node --check voltguide.js
           node --check market-core.js
           node --check market.js
+          node --check voltdeal-core.js
+          node --check voltdeal.js
           node --check netlify/functions/voltguide-ai.mjs
       - name: Check domain logic and integration structure
         run: node --test tests/*.test.cjs tests/*.test.mjs

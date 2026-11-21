@@ -1,0 +1,77 @@
+/* VoltDeal: matching VoltMarket design, with clear simulated roles. */
+.deal-shell{max-width:1160px}
+.deal-hero{padding:38px 0 22px}
+.deal-hero .back-link{margin-bottom:18px}
+.deal-hero h1{font-size:clamp(35px,5vw,56px);line-height:1.1;letter-spacing:-.045em;margin:12px 0 14px}
+.deal-hero h1 span{color:var(--lime)}
+.deal-hero>p{color:#b6cad9;max-width:820px;font-size:15px;margin:0 0 19px}
+.deal-warning{padding:14px 18px;border-left:3px solid #e4be7e;border-radius:9px;background:#302a2c;color:#ebd9c1;font-size:13px;line-height:1.6}
+.deal-warning strong{color:#ffe1a4}
+.deal-item{border:1px solid #436d71;border-radius:19px;background:linear-gradient(120deg,#17323b,#152b3e);padding:20px 24px;margin:18px 0;display:flex;align-items:center;gap:20px}
+.item-symbol{width:83px;height:83px;border:1px solid #557482;background:#194751;border-radius:17px;display:grid;place-items:center;font-size:49px;flex:none}
+.item-heading{flex:1;min-width:0}
+.item-heading h2{font-size:24px;margin:4px 0;letter-spacing:-.02em}
+.item-heading p{font-size:12px;color:#b3c9db;margin:0}
+.item-heading .label{color:#a6e8cf;font-size:11px;font-weight:800;letter-spacing:.1em}
+.item-price{font-size:25px;font-weight:850;white-space:nowrap}
+.deal-grid{display:grid;grid-template-columns:minmax(0,1.52fr) minmax(300px,.9fr);gap:18px;align-items:start}
+.deal-grid>.panel{padding:24px;min-width:0}
+.deal-progress{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:6px 0 25px}
+.deal-progress-step{position:relative;padding:11px 6px;text-align:center;border-radius:11px;background:#182838;border:1px solid #354d64}
+.deal-progress-step.done{background:#173f3b;border-color:#417e6b}
+.deal-progress-step.current{background:#24474a;border-color:#71dbb9}
+.deal-progress-step small{display:block;color:#c4d4dd;font-size:10px;line-height:1.25;margin-top:4px}
+.deal-progress-step strong{color:#a9bbd0;font-size:12px}
+.deal-progress-step.done strong,.deal-progress-step.current strong{color:#8bf1cc}
+.role-picker{border-top:1px solid #344b5f;border-bottom:1px solid #344b5f;padding:20px 0;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.role-picker strong{display:block;font-size:13px}
+.role-picker small{display:block;color:#a2b3c8;font-size:11px}
+.role-buttons{display:flex;gap:7px;flex-wrap:wrap}
+.role-btn{border-radius:10px;border:1px solid #466079;background:#17283b;padding:10px 13px;color:#d4e4f2;font-size:12px;font-weight:700}
+.role-btn.active{background:#204c47;border-color:#61d9b2;color:#dcfff1}
+.status-box{border-radius:12px;background:#173040;border:1px solid #395973;padding:16px;margin:10px 0 20px}
+.status-box .status-name{color:#8af2c8;font-size:12px;font-weight:800;letter-spacing:.03em}
+.status-box h3{font-size:19px;margin:7px 0}
+.status-box p{color:#c1d1e2;font-size:13px;margin:3px 0}
+.action-content h3{font-size:19px;margin:0 0 10px}
+.action-content p{color:#b8cada;font-size:13px}
+.action-content form{display:flex;flex-direction:column;gap:13px}
+.action-content label:not(.tick){display:flex;flex-direction:column;gap:6px;color:#c9deeb;font-size:13px;font-weight:700}
+.action-content select{min-width:0}
+.action-content .tick{display:flex;align-items:start;gap:11px;font-size:13px;color:#d1e5ef;line-height:1.45;border:1px solid #3d546b;border-radius:10px;padding:13px;background:#14273a}
+.action-content input[type=checkbox]{accent-color:#70edc2;width:19px;height:19px;flex:none;margin-top:1px}
+.action-content .button-row{display:flex;gap:10px;flex-wrap:wrap}
+.action-content .button-row button{min-width:120px}
+.action-content .info{background:#243143;color:#bcd1dd;border-left:3px solid #7db1c9;padding:12px;border-radius:7px;font-size:12px}
+.action-content .risk{background:#422b2e;border-left:3px solid #e8aa8c;color:#f7d4c8;border-radius:9px;padding:12px;font-size:13px}
+.action-content .safe{background:#163c38;border:1px solid #327f6f;border-radius:10px;padding:11px;font-size:13px;color:#caffee}
+.reset-area{padding-top:15px;border-top:1px solid #314b5b;margin-top:20px}
+.safety h2{font-size:21px;margin:9px 0 21px}
+.safety-card{display:flex;gap:12px;padding:16px 0;border-top:1px solid #354d62}
+.safety-icon{width:37px;height:37px;flex:none;display:grid;place-items:center;border:1px solid #3f7780;border-radius:10px;font-size:20px;background:#21404b}
+.safety-card strong{font-size:14px}
+.safety-card p{font-size:12px;margin:3px 0 6px;color:#a8bfd1}
+.safety-card a{font-size:12px;font-weight:750;color:#87eccc}
+.safety-tip{background:#252d38;border-left:3px solid #d7bd7a;padding:15px;border-radius:8px;margin-top:19px}
+.safety-tip p{font-size:12px}
+.inspection-info{margin-top:10px;padding:11px;border:1px dashed #536d7f;border-radius:10px;font-size:12px;color:#c6dae3}
+.history-panel{margin-top:18px}
+.history-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:18px}
+.history-head h2{font-size:21px;margin:8px 0 0}
+.history{display:flex;flex-direction:column;gap:11px}
+.history-item{display:flex;gap:12px;align-items:start}
+.history-dot{width:12px;height:12px;border-radius:50%;background:#62d9b0;box-shadow:0 0 0 5px #62d9b013;margin:5px;flex:none}
+.history-item strong{display:block;font-size:13px}
+.history-item span{color:#a8bacd;font-size:11px}
+.deal-faq{margin:35px 0}
+.deal-faq h2{font-size:24px;letter-spacing:-.02em}
+.faq-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.faq-grid>div{background:#142339;border:1px solid #385068;border-radius:13px;padding:18px}
+.faq-grid strong{font-size:14px}
+.faq-grid p{font-size:12px;color:#afc5d6;margin:8px 0 0}
+.example-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:17px 0}
+.example-card{border:1px solid #385e6a;background:#193143;border-radius:11px;padding:14px;display:flex;align-items:center;gap:13px}
+.example-card span{font-size:28px}.example-card strong{display:block;font-size:14px}.example-card small{color:#aec2d6;font-size:11px}
+@media(max-width:900px){.deal-grid{grid-template-columns:1fr}.safety{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.safety .eyebrow,.safety h2,.safety .inspection-info,.safety .safety-tip{grid-column:1/-1}.safety-card{border:1px solid #3c566d;border-radius:12px;padding:12px}.role-picker{flex-wrap:wrap}}
+@media(max-width:620px){.deal-item{flex-wrap:wrap;padding:17px}.item-symbol{width:62px;height:62px;font-size:40px}.item-price{font-size:23px;margin-left:auto}.item-heading h2{font-size:19px}.deal-grid>.panel{padding:18px}.deal-progress{grid-template-columns:repeat(5,minmax(0,1fr))}.deal-progress-step{padding:8px 3px}.deal-progress-step small{font-size:9px}.role-picker{align-items:flex-start;flex-direction:column}.safety{display:block}.safety-card{border-left:none;border-right:none;border-radius:0;padding:15px 0}.history-head{align-items:start;flex-direction:column}.faq-grid{grid-template-columns:1fr}.example-grid{grid-template-columns:1fr}.action-content .button-row button{flex:1}.deal-hero{padding-top:25px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}

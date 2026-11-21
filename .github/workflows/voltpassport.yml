@@ -7,6 +7,7 @@ on:
       - feature/voltguide-ai-assistant
       - feature/voltmarket-unified-flow
       - feature/voltdeal-buying-flow
+      - feature/mobile-first-marketplace
   pull_request:
     paths:
       - 'passport-*.js'
@@ -15,6 +16,7 @@ on:
       - 'voltguide*'
       - 'market*'
       - 'voltdeal*'
+      - 'mobile-shell*'
       - 'passport-app.js'
       - 'index.html'
       - 'netlify/functions/voltguide-ai.mjs'
@@ -41,6 +43,7 @@ jobs:
           node --check market.js
           node --check voltdeal-core.js
           node --check voltdeal.js
+          node --check mobile-shell.js
           node --check netlify/functions/voltguide-ai.mjs
       - name: Check domain logic and integration structure
         run: node --test tests/*.test.cjs tests/*.test.mjs

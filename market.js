@@ -195,9 +195,15 @@
       return '<label>'+esc(f.label)+'<input data-attr="'+esc(f.id)+'" type="number" min="'+f.min+'" max="'+f.max+'" inputmode="numeric" placeholder="Необязательно"></label>';
     }).join('');
   }
-  function saveDraft(event){
+  async function saveDraft(event){
     event.preventDefault();
+    if(savingDraft)return;
     if(drafts.length>=30){$('formMessage').textContent='Ограничение демо: максимум 30 черновиков. Удали старые перед созданием новых.';return;}
+    const files=Array.from($('formPhotos').files||[]);
+    try{
+      if(files.length&&(!photos||files.length>photos.LIMIT))throw new Error('Выбери не более четырёх фото.');
+      files.forEach(f=>photos.validateFile(f));
+    }catch(err){$('formMessage').textContent=err.message;return;}
     const attrs=Object.create(null);
     $('dynamicFields').querySelectorAll('[data-attr]').forEach(x=>attrs[x.dataset.attr]=x.value);
     const id='draft-'+(globalThis.crypto&&crypto.randomUUID?crypto.randomUUID().replace(/-/g,'').slice(0,16):String(Date.now())+String(Math.floor(Math.random()*100000)));
@@ -205,11 +211,22 @@
       price:$('formPrice').value,city:$('formCity').value,condition:$('formCondition').value,
       note:$('formNote').value,attrs,claims:{},created:Date.now()});
     if(!normalized){$('formMessage').textContent='Проверь название, цену, категорию и город.';return;}
-    drafts.unshift(normalized);
-    if(!saveDisk()){drafts.shift();return;}
-    $('draftForm').reset();$('formMessage').textContent='';
-    notify('Черновик сохранён только в этом браузере — не опубликован.');
-    goto('#item/'+encodeURIComponent(normalized.id));
+    const btn=$('draftForm').querySelector('button[type="submit"]');
+    savingDraft=true;if(btn){btn.disabled=true;btn.textContent='Сохраняем черновик…';}
+    let photoWarning='';
+    try{
+      drafts.unshift(normalized);
+      if(!saveDisk()){drafts.shift();return;}
+      if(files.length){
+        try{await photos.save(normalized.id,files);}
+        catch(err){photoWarning='Фото не сохранились: '+String(err.message||'Ошибка памяти').slice(0,130)+'. Черновик сохранён без фотографий.';}
+      }
+      $('draftForm').reset();clearPreview();$('formMessage').textContent='';
+      goto('#item/'+encodeURIComponent(normalized.id));
+      notify(photoWarning||'Черновик и фотографии сохранены только на устройстве — не опубликованы.');
+    }finally{
+      savingDraft=false;if(btn){btn.disabled=false;btn.textContent='Сохранить черновик →';}
+    }
   }
   function getClaims(item){
     if(!passport||typeof passport.getChecks!=='function')return [];

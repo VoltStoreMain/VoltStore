@@ -125,6 +125,7 @@
     $('detailView').hidden=view!=='detail';
     $('draftView').hidden=view!=='draft';
     $('discover').hidden=view!=='list';
+    if(view==='draft')clearPhotos();
     if(view==='detail')renderDetail(selectedItem);
     else if(view==='draft')renderForm();
     else renderCatalog();
@@ -223,7 +224,7 @@
       }
       $('draftForm').reset();clearPreview();$('formMessage').textContent='';
       goto('#item/'+encodeURIComponent(normalized.id));
-      notify(photoWarning||'Черновик и фотографии сохранены только на устройстве — не опубликованы.');
+      notify(photoWarning||(files.length?'Черновик и фотографии сохранены только на устройстве — не опубликованы.':'Черновик сохранён только в браузере — не опубликован.'));
     }finally{
       savingDraft=false;if(btn){btn.disabled=false;btn.textContent='Сохранить черновик →';}
     }

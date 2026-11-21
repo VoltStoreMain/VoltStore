@@ -247,7 +247,11 @@
       '<p>Это ваш учебный черновик, не опубликованное удостоверение состояния. Выберите по каждому пункту честный статус. Данные останутся только в браузере.</p>'+
       '<div class="claims">'+passport.getChecks(item.category).map(x=>'<label class="claim"><small>'+esc(x.title)+(x.critical?' · важно':'')+'</small><select data-draft-claim="'+esc(x.id)+'">'+
         [['unknown','Не знаю / не проверял'],['ok','Со слов владельца: исправно'],['issue','Известен дефект']].map(pair=>'<option value="'+pair[0]+'"'+((item.claims[x.id]||'unknown')===pair[0]?' selected':'')+'>'+pair[1]+'</option>').join('')+
-      '</select></label>').join('')+'</div><button type="button" class="primary" id="saveDraftClaims">Сохранить отметки только здесь</button></section>':'';
+      '</select></label>').join('')+'</div><button type="button" class="primary" id="saveDraftClaims">Сохранить отметки только здесь</button>'+ 
+      '<div class="photo-field" style="margin-top:18px"><label for="editDraftPhotos">Заменить фотографии черновика (до 4)</label>'+
+      '<input id="editDraftPhotos" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple>'+
+      '<button type="button" class="outline" id="replaceDraftPhotos">Обновить фото на устройстве</button>'+
+      '<p class="photo-hint">Предыдущие фотографии этого черновика будут заменены, не опубликованы.</p></div></section>':'';
     $('detailContent').innerHTML=
       '<div class="detail-heading"><div><span class="eyebrow">'+esc(c.name)+' / '+(isDraft?'МОЙ ЧЕРНОВИК':'ДЕМОНСТРАЦИОННЫЙ ПРИМЕР')+'</span><h1 id="detailTitle">'+esc(item.title)+'</h1><p class="fine">📍 '+esc(item.city)+' · '+esc(item.condition)+'</p></div><div class="big-price">'+price(item.price)+'</div></div>'+
       '<div class="detail-summary"><section class="panel"><div class="detail-visual" id="detailGallery"><span aria-hidden="true">'+c.icon+'</span></div><div id="galleryThumbs" class="gallery-thumbs" aria-label="Фотографии товара"></div><h2>Характеристики и описание</h2><p>'+esc(item.note||'Описание пока не заполнено. Не считай отсутствие описания признаком исправности.')+'</p>'+
@@ -281,7 +285,21 @@
     if(isDraft){
       $('deleteDraft').addEventListener('click',()=>removeDraft(item.id));
       $('saveDraftClaims').addEventListener('click',()=>saveDraftClaims(item.id));
+      $('replaceDraftPhotos').addEventListener('click',()=>replaceDraftPhotos(item.id));
     }
+  }
+  async function replaceDraftPhotos(id){
+    const control=$('editDraftPhotos'),chosen=Array.from(control?.files||[]);
+    if(!chosen.length)return notify('Сначала выбери фотографии для обновления.');
+    if(!photos)return notify('Локальное хранилище фото недоступно в этом браузере.');
+    const btn=$('replaceDraftPhotos');btn.disabled=true;btn.textContent='Сжимаем фото…';
+    try{
+      await photos.save(id,chosen);
+      const item=drafts.find(x=>x.id===id);
+      if(item&&document.body.dataset.view==='detail')renderDetail(item);
+      notify('Фотографии обновлены только на этом устройстве.');
+    }catch(err){notify('Не удалось обновить фото: '+String(err.message||'Ошибка памяти').slice(0,110));}
+    finally{if(btn.isConnected){btn.disabled=false;btn.textContent='Обновить фото на устройстве';}}
   }
   function saveDraftClaims(id){
     const index=drafts.findIndex(x=>x.id===id);

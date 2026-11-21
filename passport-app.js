@@ -93,11 +93,26 @@
       notes.appendChild(el('span','note-pill','Продавец не указал: '+c.title));
     });
   }
-  function loadBuyer() {
-    const cached=safeSessionRead(sessionKey);if(cached){buyerState=core.normalize(cached);return;}
-    const fromVolt=safeSessionRead(VOLTCHECK_KEY);
-    if(fromVolt&&fromVolt.state){buyerState=core.normalizeVoltCheck(fromVolt);saveBuyer();notify('Подтянули отметки из VoltCheck в этой вкладке');}
+  function importVoltCheck() {
+    const saved=safeSessionRead(VOLTCHECK_KEY);
+    if(!saved||!saved.state)return false;
+    const incoming=core.normalizeVoltCheck(saved);
+    let imported=false;
+    core.CHECKS.forEach(c=>{
+      if(buyerState[c.id].status==='unknown'&&incoming[c.id].status!=='unknown'){
+        buyerState[c.id]={status:incoming[c.id].status,note:incoming[c.id].note||buyerState[c.id].note};
+        imported=true;
+      }
+    });
+    if(imported){saveBuyer();notify('Отметки из VoltCheck перенесены в эту вкладку');}
+    return imported;
   }
+  function loadBuyer() {
+    const cached=safeSessionRead(sessionKey);
+    if(cached)buyerState=core.normalize(cached);
+    importVoltCheck();
+  }
+  window.addEventListener('pageshow',()=>{if(ad&&importVoltCheck())renderChecks();});
   function fillProduct() {
     $('productTitle').textContent=core.clean(ad?.model,80)||'Неизвестный смартфон';
     $('productPrice').textContent=money(ad?.price);

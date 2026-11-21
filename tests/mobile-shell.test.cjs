@@ -47,7 +47,7 @@ test('advanced filters preserve original IDs and remain expanded on desktop',()=
 });
 test('mobile shell has no API key, auth, financial backend or personal data collection',()=>{
  const js=read('mobile-shell.js'),css=read('mobile-shell.css');
- assert.ok(!/OPENAI_API_KEY|service_role|\\.from\\s*\\(|fetch\\s*\\(|pay\\s*\\(/.test(js));
+ assert.ok(!['OPENAI_API_KEY','service_role','fetch(','.from(','pay('].some(token=>js.includes(token)));
  assert.ok(!js.includes('localStorage'));
  assert.ok(!/data-cardnumber|data-ccnumber/.test(js+css));
 });

@@ -10,8 +10,14 @@
   <link rel="stylesheet" href="market.css">
   <script defer src="passport-core.js"></script>
   <script defer src="market-core.js"></script>
+  <script defer src="photo-store.js"></script>
   <script defer src="market.js"></script>
+  <script defer src="pwa-client.js"></script>
   <link rel="stylesheet" href="mobile-shell.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/voltstore-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
   <header class="header">
@@ -48,6 +54,12 @@
     </section>
     <section id="discover" class="discover" aria-labelledby="discoverTitle">
       <div class="section-top"><div><span class="eyebrow">ПОДБОР ТОВАРА</span><h2 id="discoverTitle">Что ищем?</h2><p>У каждой категории — собственные характеристики и проверки.</p></div><span class="beta-label">Локальная демонстрация</span></div>
+      <div class="pwa-install" id="pwaInstall" hidden>
+        <span aria-hidden="true">📲</span><p id="pwaMessage">Установи VoltStore на телефон</p>
+        <button type="button" id="pwaInstallButton" class="primary">Установить</button>
+        <button type="button" id="pwaDismiss" class="pwa-close" aria-label="Закрыть подсказку">✕</button>
+      </div>
+      <div class="pwa-update" id="pwaUpdate" hidden><span>Доступна новая версия VoltStore.</span><button type="button" class="outline">Обновить</button></div>
       <div id="categoryTabs" class="categories" role="group" aria-label="Категории товаров"></div>
       <div class="search-panel">
         <div class="filters">
@@ -77,6 +89,12 @@
           <label>Город<input id="formCity" required minlength="2" maxlength="40" placeholder="Например, Алматы"></label>
           <label>Состояние<select id="formCondition" required></select></label>
           <div id="dynamicFields" class="dynamic-fields" aria-label="Характеристики выбранной категории"></div>
+          <div class="photo-field full">
+            <label for="formPhotos">Фотографии своего товара <span>(до 4)</span></label>
+            <input id="formPhotos" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple>
+            <div id="photoPreview" class="photo-preview" aria-live="polite"></div>
+            <p id="photoHint" class="photo-hint">Фото сжимаются и остаются только в твоём браузере — не загружаются на сайт. JPG, PNG, WebP, HEIC (если поддерживается телефоном); до 12 МБ каждое.</p>
+          </div>
           <label class="full">Честное описание состояния<textarea id="formNote" rows="4" maxlength="500" placeholder="Укажи дефекты, ремонты и вопросы для проверки. Не вводи телефон, адрес, документы или IMEI."></textarea></label>
         </div>
         <div class="draft-hint">Внимание: сохранение черновика <strong>не публикует объявление</strong> и не делает его видимым другим людям. Фото и личные данные не собираются.</div>

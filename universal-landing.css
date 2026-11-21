@@ -4,3 +4,14 @@
 .trust-module-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;min-width:250px}.trust-module-actions .btn{text-decoration:none;text-align:center}
 @media(max-width:800px){.trust-module{flex-direction:column;align-items:stretch;padding:22px 20px}.trust-module-actions{min-width:0}.trust-module-actions a{flex:1}}
 @media(max-width:470px){.trust-module-actions{flex-direction:column}.trust-module-actions a{width:100%}}
+
+
+/* Install prompt on the main VoltStore homepage (visible only when offered). */
+.pwa-install{display:flex;align-items:center;gap:12px;margin:16px 0;padding:12px 14px;
+  background:#153b40;border:1px solid #3f8271;border-radius:13px;color:#ddfff1}
+.pwa-install[hidden]{display:none!important}
+.pwa-install>span:first-child{font-size:25px;flex:none}
+.pwa-install p{margin:0;flex:1;font-size:13px}
+.pwa-install button{font-size:13px;min-height:42px}
+#pwaDismiss{background:transparent;border:0;color:#bfe9e1;cursor:pointer;min-width:34px}
+@media(max-width:600px){.pwa-install{flex-wrap:wrap;gap:9px;padding:11px}.pwa-install p{font-size:12px;line-height:1.5}}

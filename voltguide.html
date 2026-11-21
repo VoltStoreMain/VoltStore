@@ -8,12 +8,15 @@
   <meta name="robots" content="noindex, nofollow">
   <title>VoltGuide — помощник перед покупкой | VoltStore</title>
   <link rel="stylesheet" href="voltguide.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script defer src="config.js"></script>
   <script defer src="passport-core.js"></script>
   <script defer src="voltguide-core.js"></script>
   <script defer src="voltguide.js"></script>
   <link rel="stylesheet" href="mobile-shell.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/voltstore-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
   <header class="topbar">
@@ -61,6 +64,7 @@
     </section>
     <footer>VoltGuide Beta · Отметки осмотра хранятся в этой вкладке браузера. Безопасность сделки не гарантируется. <a href="./#resale">Вернуться в VoltStore</a></footer>
   </main>
+  <script defer src="pwa-client.js"></script>
   <script defer src="mobile-shell.js"></script>
 </body>
 </html>

@@ -11,6 +11,9 @@
   <meta content="#0a0d14" name="theme-color"/>
   <link href="styles.css" rel="stylesheet"/>
   <link href="universal-landing.css" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="apple-touch-icon" href="icons/voltstore-192.png"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
  </head>
  <body>
   <div id="shop">
@@ -48,6 +51,12 @@
     </div>
    </header>
    <main class="wrap">
+    <div class="pwa-install" id="pwaInstall" hidden>
+      <span aria-hidden="true">📲</span><p id="pwaMessage">VoltStore на главном экране телефона</p>
+      <button type="button" id="pwaInstallButton" class="btn primary">Установить</button>
+      <button type="button" id="pwaDismiss" aria-label="Закрыть">✕</button>
+    </div>
+    <div id="pwaUpdate" class="pwa-install" hidden><span>Доступна новая версия VoltStore</span><button class="btn" type="button">Обновить</button></div>
     <div class="hero">
      <span class="eyebrow">
       <span class="pulse">
@@ -247,5 +256,6 @@
   </script>
   <script defer="" src="live.js">
   </script>
+  <script defer src="pwa-client.js"></script>
  </body>
 </html>

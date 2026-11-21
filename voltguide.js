@@ -62,16 +62,32 @@ async function copyQuestions(){
 function result(text,error){
  const element=$('aiResult');element.hidden=false;element.className='ai-response'+(error?' error':'');element.textContent=text;
 }
+let sdkPromise=null;
+function ensureAuthLibrary(){
+ if(window.supabase)return Promise.resolve(window.supabase);
+ if(!sdkPromise){
+   sdkPromise=new Promise((resolve,reject)=>{
+     const script=document.createElement('script');
+     script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js';
+     script.async=true;
+     script.onload=()=>window.supabase?resolve(window.supabase):reject(new Error('Библиотека авторизации не загрузилась.'));
+     script.onerror=()=>reject(new Error('Нет связи с сервером авторизации. Бесплатные рекомендации доступны.'));
+     document.head.appendChild(script);
+   }).catch(err=>{sdkPromise=null;throw err;});
+ }
+ return sdkPromise;
+}
 async function ask(){
  if(!$('consent').checked){result('Чтобы отправить вопрос AI-провайдеру, сначала подтвердите согласие.',true);return;}
  let payload;
  try{payload=guide.aiPayload(core,inputs());}
  catch(e){result(e.message,true);return;}
  const conf=window.VOLT_CONFIG||{};
- if(!window.supabase||!conf.supabaseUrl||!conf.supabaseAnonKey){result('Пока недоступен вход VoltStore. Экспертные подсказки выше работают бесплатно.',true);return;}
+ if(!conf.supabaseUrl||!conf.supabaseAnonKey){result('Пока недоступен вход VoltStore. Экспертные подсказки выше работают бесплатно.',true);return;}
  const btn=$('askAI');btn.disabled=true;btn.textContent='Проверяю подключение…';
  try{
-   const sb=window.supabase.createClient(conf.supabaseUrl,conf.supabaseAnonKey);
+   const sdk=await ensureAuthLibrary();
+   const sb=sdk.createClient(conf.supabaseUrl,conf.supabaseAnonKey);
    const {data:{session}}=await sb.auth.getSession();
    if(!session||!session.access_token)throw new Error('Для экспериментального AI-режима сначала войдите в VoltStore. Бесплатный экспертный режим доступен без входа.');
    const response=await fetch('/.netlify/functions/voltguide-ai',{method:'POST',

@@ -1,0 +1,57 @@
+{
+  "id": "./market.html",
+  "name": "VoltStore — покупай осознанно",
+  "short_name": "VoltStore",
+  "description": "VoltMarket Beta: подбор товаров, VoltCheck, VoltGuide и безопасный сценарий сделки. Демо без реальных платежей.",
+  "lang": "ru",
+  "start_url": "./market.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#090e19",
+  "theme_color": "#101f30",
+  "categories": [
+    "shopping",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "./icons/voltstore-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/voltstore-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/voltstore-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Найти товар",
+      "short_name": "Каталог",
+      "url": "./market.html#discover"
+    },
+    {
+      "name": "Продать (черновик)",
+      "short_name": "Продать",
+      "url": "./market.html#draft"
+    },
+    {
+      "name": "VoltCheck",
+      "short_name": "Проверка",
+      "url": "./voltcheck-all.html"
+    }
+  ]
+}

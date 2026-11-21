@@ -7,6 +7,87 @@
   const storage='voltmarket-local-drafts-v1';
   let drafts=[],selected='all',filter={q:'',category:'all',city:'',condition:'',maxPrice:'',sort:'newest',attribute:'',attributeValue:''};
   let selectedItem=null,toastTimer;
+  const photos=window.VoltPhotos||null;
+  let photoGeneration=0,photoUrls=[],previewUrls=[],searchTimer=0,savingDraft=false;
+  function clearPhotos(){
+    photoGeneration++;
+    for(const url of photoUrls)URL.revokeObjectURL(url);
+    photoUrls=[];
+  }
+  function clearPreview(){
+    for(const url of previewUrls)URL.revokeObjectURL(url);
+    previewUrls=[];
+    if($('photoPreview'))$('photoPreview').replaceChildren();
+  }
+  function previewSelected(){
+    clearPreview();
+    const input=$('formPhotos'),area=$('photoPreview'),hint=$('photoHint');
+    const files=Array.from(input.files||[]);
+    if(!photos||!files.length){hint.textContent='Фото сжимаются и сохраняются только на твоём устройстве. Не загружаются на сайт.';return;}
+    if(files.length>photos.LIMIT){
+      hint.textContent='Выбери максимум 4 снимка — лишние фотографии не будут сохранены.';
+      input.value='';return;
+    }
+    try{
+      files.forEach(photos.validateFile);
+    }catch(e){hint.textContent=e.message;input.value='';return;}
+    for(const file of files){
+      const url=URL.createObjectURL(file);
+      previewUrls.push(url);
+      const img=document.createElement('img');
+      img.src=url;img.alt='Выбранное фото: '+file.name.slice(0,80);img.loading='lazy';img.decoding='async';
+      area.appendChild(img);
+    }
+    hint.textContent='Выбрано '+files.length+' из 4. При сохранении фото будут сжаты и останутся на этом устройстве.';
+  }
+  async function hydrateCovers(items){
+    if(!photos)return;
+    const generation=photoGeneration;
+    const nodes=[...$('listingGrid').querySelectorAll('[data-photo-id]')];
+    const fetchCover=async(node)=>{
+      if(generation!==photoGeneration||!node.isConnected)return;
+      try{
+        const blob=await photos.first(node.dataset.photoId);
+        if(generation!==photoGeneration||!node.isConnected||!blob)return;
+        const url=URL.createObjectURL(blob);photoUrls.push(url);
+        const image=document.createElement('img');image.src=url;image.alt='Фотография товара из локального черновика';
+        image.loading='lazy';image.decoding='async';image.className='listing-photo';
+        node.prepend(image);
+      }catch(_){/* no images or IndexedDB disabled: keep category illustration */}
+    };
+    if('IntersectionObserver' in window){
+      const observer=new IntersectionObserver((entries,obs)=>{
+        for(const entry of entries)if(entry.isIntersecting){obs.unobserve(entry.target);fetchCover(entry.target);}
+      },{rootMargin:'180px'});
+      nodes.forEach(node=>observer.observe(node));
+    }else nodes.forEach(fetchCover);
+  }
+  async function hydrateGallery(item){
+    if(!photos||item.kind!=='draft')return;
+    const generation=photoGeneration,area=$('detailGallery'),thumbs=$('galleryThumbs');
+    if(!area||!thumbs)return;
+    try{
+      const blobs=await photos.list(item.id);
+      if(!blobs.length||generation!==photoGeneration||!area.isConnected)return;
+      const urls=blobs.map(b=>URL.createObjectURL(b));photoUrls.push(...urls);
+      area.replaceChildren();
+      const main=document.createElement('img');main.src=urls[0];main.alt='Фото товара: '+item.title;
+      main.decoding='async';main.className='gallery-main';
+      area.appendChild(main);thumbs.replaceChildren();
+      urls.forEach((url,i)=>{
+        const button=document.createElement('button');button.type='button';button.className='gallery-thumb';
+        button.setAttribute('aria-label','Посмотреть фото '+(i+1));button.setAttribute('aria-pressed',String(i===0));
+        const image=document.createElement('img');image.src=url;image.alt='';image.loading='lazy';
+        button.appendChild(image);
+        button.addEventListener('click',()=>{
+          main.src=url;
+          thumbs.querySelectorAll('button').forEach((b,index)=>b.setAttribute('aria-pressed',String(index===i)));
+        });
+        thumbs.appendChild(button);
+      });
+    }catch(_){/* device storage unavailable: illustration remains */}
+  }
+
   function notify(s){
     const t=$('notice');t.textContent=s;t.hidden=false;
     clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.hidden=true,3400);
@@ -44,6 +125,7 @@
     $('detailView').hidden=view!=='detail';
     $('draftView').hidden=view!=='draft';
     $('discover').hidden=view!=='list';
+    if(view==='draft')clearPhotos();
     if(view==='detail')renderDetail(selectedItem);
     else if(view==='draft')renderForm();
     else renderCatalog();
@@ -73,6 +155,7 @@
     filter.attributeValue=input.value;
   }
   function renderCatalog(){
+    clearPhotos();
     tabs();addCities();attributePicker();
     $('search').value=filter.q;$('condition').value=filter.condition;
     $('maxPrice').value=filter.maxPrice;$('sort').value=filter.sort;
@@ -83,12 +166,13 @@
       const cat=core.category(item.category);
       const chips=cat.fields.map(f=>item.attrs[f.id]!==undefined?'<span class="chip">'+esc(String(item.attrs[f.id]))+'</span>':'').filter(Boolean).slice(0,2).join('');
       return '<article class="listing">'+
-        '<div class="illustration '+esc(item.category)+'"><span class="image-tag">'+(item.kind==='draft'?'МОЙ ЧЕРНОВИК':'ДЕМО-ПРИМЕР')+'</span><span aria-hidden="true">'+cat.icon+'</span></div>'+
+        '<div class="illustration '+esc(item.category)+'"'+(item.kind==='draft'?' data-photo-id="'+esc(item.id)+'"':'')+'><span class="image-tag">'+(item.kind==='draft'?'МОЙ ЧЕРНОВИК':'ДЕМО-ПРИМЕР')+'</span><span aria-hidden="true">'+cat.icon+'</span></div>'+
         '<div class="listing-copy"><span class="category-label">'+esc(cat.name)+' · '+esc(item.city)+'</span><h3>'+esc(item.title)+'</h3>'+
         '<div class="chips"><span class="chip">'+esc(item.condition)+'</span>'+chips+'</div><div class="price">'+price(item.price)+'</div>'+
         '<div class="meta">'+(item.kind==='draft'?'Никому не опубликовано':'Цена и товар — демонстрационные')+'</div>'+
         '<button class="view" type="button" data-open="'+esc(item.id)+'">Изучить товар →</button></div></article>';
     }).join(''):'<div class="empty">По заданным фильтрам нет товаров.<br><button class="outline" type="button" data-reset="1">Сбросить фильтры</button></div>';
+    hydrateCovers(items);
   }
   function chooseCategory(cat){
     if(cat!=='all'&&!core.CATEGORY_IDS.includes(cat))return;
@@ -112,9 +196,15 @@
       return '<label>'+esc(f.label)+'<input data-attr="'+esc(f.id)+'" type="number" min="'+f.min+'" max="'+f.max+'" inputmode="numeric" placeholder="Необязательно"></label>';
     }).join('');
   }
-  function saveDraft(event){
+  async function saveDraft(event){
     event.preventDefault();
+    if(savingDraft)return;
     if(drafts.length>=30){$('formMessage').textContent='Ограничение демо: максимум 30 черновиков. Удали старые перед созданием новых.';return;}
+    const files=Array.from($('formPhotos').files||[]);
+    try{
+      if(files.length&&(!photos||files.length>photos.LIMIT))throw new Error('Выбери не более четырёх фото.');
+      files.forEach(f=>photos.validateFile(f));
+    }catch(err){$('formMessage').textContent=err.message;return;}
     const attrs=Object.create(null);
     $('dynamicFields').querySelectorAll('[data-attr]').forEach(x=>attrs[x.dataset.attr]=x.value);
     const id='draft-'+(globalThis.crypto&&crypto.randomUUID?crypto.randomUUID().replace(/-/g,'').slice(0,16):String(Date.now())+String(Math.floor(Math.random()*100000)));
@@ -122,17 +212,29 @@
       price:$('formPrice').value,city:$('formCity').value,condition:$('formCondition').value,
       note:$('formNote').value,attrs,claims:{},created:Date.now()});
     if(!normalized){$('formMessage').textContent='Проверь название, цену, категорию и город.';return;}
-    drafts.unshift(normalized);
-    if(!saveDisk()){drafts.shift();return;}
-    $('draftForm').reset();$('formMessage').textContent='';
-    notify('Черновик сохранён только в этом браузере — не опубликован.');
-    goto('#item/'+encodeURIComponent(normalized.id));
+    const btn=$('draftForm').querySelector('button[type="submit"]');
+    savingDraft=true;if(btn){btn.disabled=true;btn.textContent='Сохраняем черновик…';}
+    let photoWarning='';
+    try{
+      drafts.unshift(normalized);
+      if(!saveDisk()){drafts.shift();return;}
+      if(files.length){
+        try{await photos.save(normalized.id,files);}
+        catch(err){photoWarning='Фото не сохранились: '+String(err.message||'Ошибка памяти').slice(0,130)+'. Черновик сохранён без фотографий.';}
+      }
+      $('draftForm').reset();clearPreview();$('formMessage').textContent='';
+      goto('#item/'+encodeURIComponent(normalized.id));
+      notify(photoWarning||(files.length?'Черновик и фотографии сохранены только на устройстве — не опубликованы.':'Черновик сохранён только в браузере — не опубликован.'));
+    }finally{
+      savingDraft=false;if(btn){btn.disabled=false;btn.textContent='Сохранить черновик →';}
+    }
   }
   function getClaims(item){
     if(!passport||typeof passport.getChecks!=='function')return [];
     return passport.getChecks(item.category).map(x=>({title:x.title,status:item.claims[x.id]||'unknown',critical:!!x.critical}));
   }
   function renderDetail(item){
+    clearPhotos();
     const c=core.category(item.category),isDraft=item.kind==='draft';
     const attrs=c.fields.filter(x=>item.attrs[x.id]!==undefined);
     const claims=getClaims(item);
@@ -146,10 +248,14 @@
       '<p>Это ваш учебный черновик, не опубликованное удостоверение состояния. Выберите по каждому пункту честный статус. Данные останутся только в браузере.</p>'+
       '<div class="claims">'+passport.getChecks(item.category).map(x=>'<label class="claim"><small>'+esc(x.title)+(x.critical?' · важно':'')+'</small><select data-draft-claim="'+esc(x.id)+'">'+
         [['unknown','Не знаю / не проверял'],['ok','Со слов владельца: исправно'],['issue','Известен дефект']].map(pair=>'<option value="'+pair[0]+'"'+((item.claims[x.id]||'unknown')===pair[0]?' selected':'')+'>'+pair[1]+'</option>').join('')+
-      '</select></label>').join('')+'</div><button type="button" class="primary" id="saveDraftClaims">Сохранить отметки только здесь</button></section>':'';
+      '</select></label>').join('')+'</div><button type="button" class="primary" id="saveDraftClaims">Сохранить отметки только здесь</button>'+ 
+      '<div class="photo-field" style="margin-top:18px"><label for="editDraftPhotos">Заменить фотографии черновика (до 4)</label>'+
+      '<input id="editDraftPhotos" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple>'+
+      '<button type="button" class="outline" id="replaceDraftPhotos">Обновить фото на устройстве</button>'+
+      '<p class="photo-hint">Предыдущие фотографии этого черновика будут заменены, не опубликованы.</p></div></section>':'';
     $('detailContent').innerHTML=
       '<div class="detail-heading"><div><span class="eyebrow">'+esc(c.name)+' / '+(isDraft?'МОЙ ЧЕРНОВИК':'ДЕМОНСТРАЦИОННЫЙ ПРИМЕР')+'</span><h1 id="detailTitle">'+esc(item.title)+'</h1><p class="fine">📍 '+esc(item.city)+' · '+esc(item.condition)+'</p></div><div class="big-price">'+price(item.price)+'</div></div>'+
-      '<div class="detail-summary"><section class="panel"><div class="detail-visual" aria-hidden="true">'+c.icon+'</div><h2>Характеристики и описание</h2><p>'+esc(item.note||'Описание пока не заполнено. Не считай отсутствие описания признаком исправности.')+'</p>'+
+      '<div class="detail-summary"><section class="panel"><div class="detail-visual" id="detailGallery"><span aria-hidden="true">'+c.icon+'</span></div><div id="galleryThumbs" class="gallery-thumbs" aria-label="Фотографии товара"></div><h2>Характеристики и описание</h2><p>'+esc(item.note||'Описание пока не заполнено. Не считай отсутствие описания признаком исправности.')+'</p>'+
       '<div class="specs">'+attrs.map(f=>'<div class="spec"><small>'+esc(f.label)+'</small><b>'+esc(String(item.attrs[f.id]))+'</b></div>').join('')+
       '<div class="spec"><small>Заявленное состояние</small><b>'+esc(item.condition)+'</b></div><div class="spec"><small>Город</small><b>'+esc(item.city)+'</b></div></div></section>'+
       '<aside class="panel"><h2>Сначала факты, потом решение</h2><div class="trust-status"><span>!</span><span><strong>Не сертифицировано VoltStore.</strong><br>Это '+(isDraft?'локальный черновик':'вымышленный пример')+'. Заявления о состоянии не проверены независимым специалистом. Никакие деньги не принимаются.</span></div>'+
@@ -172,6 +278,7 @@
       '<select id="decisionSelect" aria-label="Моё решение"><option value="questions">Остались вопросы продавцу</option><option value="inspect">Хочу проверить товар при встрече</option><option value="decline">Решил отказаться от предложения</option></select></div>'+
       '<button class="primary" type="button" id="downloadPlan">Скачать план .txt</button></section>'+
       (isDraft?'<button class="subtle" type="button" id="deleteDraft">Удалить этот локальный черновик</button>':'');
+    hydrateGallery(item);
     const itemKey='voltmarket-decision:'+item.id;
     try{const saved=sessionStorage.getItem(itemKey);if(['questions','inspect','decline'].includes(saved))$('decisionSelect').value=saved;}catch(_){}
     $('decisionSelect').addEventListener('change',()=>{try{sessionStorage.setItem(itemKey,$('decisionSelect').value);}catch(_){}});
@@ -179,7 +286,21 @@
     if(isDraft){
       $('deleteDraft').addEventListener('click',()=>removeDraft(item.id));
       $('saveDraftClaims').addEventListener('click',()=>saveDraftClaims(item.id));
+      $('replaceDraftPhotos').addEventListener('click',()=>replaceDraftPhotos(item.id));
     }
+  }
+  async function replaceDraftPhotos(id){
+    const control=$('editDraftPhotos'),chosen=Array.from(control?.files||[]);
+    if(!chosen.length)return notify('Сначала выбери фотографии для обновления.');
+    if(!photos)return notify('Локальное хранилище фото недоступно в этом браузере.');
+    const btn=$('replaceDraftPhotos');btn.disabled=true;btn.textContent='Сжимаем фото…';
+    try{
+      await photos.save(id,chosen);
+      const item=drafts.find(x=>x.id===id);
+      if(item&&document.body.dataset.view==='detail')renderDetail(item);
+      notify('Фотографии обновлены только на этом устройстве.');
+    }catch(err){notify('Не удалось обновить фото: '+String(err.message||'Ошибка памяти').slice(0,110));}
+    finally{if(btn.isConnected){btn.disabled=false;btn.textContent='Обновить фото на устройстве';}}
   }
   function saveDraftClaims(id){
     const index=drafts.findIndex(x=>x.id===id);
@@ -209,8 +330,10 @@
   }
   function removeDraft(id){
     if(!confirm('Удалить черновик только из этого браузера?'))return;
+    const previous=drafts;
     drafts=drafts.filter(x=>x.id!==id);
-    if(!saveDisk())return;
+    if(!saveDisk()){drafts=previous;return;}
+    if(photos)photos.remove(id).catch(()=>notify('Черновик удалён, но фотографии остались в хранилище устройства.'));
     notify('Локальный черновик удалён.');goto('#discover');
   }
   function init(){
@@ -224,15 +347,16 @@
     $('backFromDraft').addEventListener('click',()=>goto('#discover'));
     $('resetFilters').addEventListener('click',resetFilters);
     $('detailContent').addEventListener('click',e=>{const jump=e.target.closest('[data-decision]');if(jump){e.preventDefault();$('decisionPanel')?.scrollIntoView({behavior:'smooth'});}});
-    $('search').addEventListener('input',e=>{filter.q=e.target.value;renderCatalog();});
+    $('search').addEventListener('input',e=>{filter.q=e.target.value;clearTimeout(searchTimer);searchTimer=setTimeout(renderCatalog,120);});
     $('city').addEventListener('change',e=>{filter.city=e.target.value;renderCatalog();});
     $('condition').addEventListener('change',e=>{filter.condition=e.target.value;renderCatalog();});
     $('maxPrice').addEventListener('change',e=>{filter.maxPrice=e.target.value;renderCatalog();});
     $('sort').addEventListener('change',e=>{filter.sort=e.target.value;renderCatalog();});
     $('attributeFilter').addEventListener('change',e=>{filter.attributeValue=e.target.value;renderCatalog();});
     $('formCategory').addEventListener('change',dynamicFields);
+    $('formPhotos').addEventListener('change',previewSelected);
     $('draftForm').addEventListener('submit',saveDraft);
-    $('draftForm').addEventListener('reset',()=>{setTimeout(dynamicFields,0);$('formMessage').textContent='';});
+    $('draftForm').addEventListener('reset',()=>{clearPreview();setTimeout(dynamicFields,0);$('formMessage').textContent='';});
     window.addEventListener('hashchange',renderRoute);
     renderRoute();
   }

@@ -47,19 +47,22 @@ self.addEventListener('fetch',event=>{
  const isPage=htmlPaths.has(file);
  event.respondWith((async()=>{
    const cache=await caches.open(CACHE_NAME);
+   // Canonicalize all static cache keys to path ONLY. Never store search params
+   // (which can contain ad IDs, model names or user choices) in Cache Storage.
+   const canonical=new URL(file,scope).href;
    if(isPage){
-     // Network-first for HTML: online content updates without trapping an old HTML shell.
+     // Network-first for HTML: live content updates and query strings aren't stored.
      try{
        const live=await fetch(request);
-       if(live.ok&&live.type==='basic')cache.put(request,live.clone()).catch(()=>{});
+       if(live.ok&&live.type==='basic')cache.put(canonical,live.clone()).catch(()=>{});
        return live;
      }catch(_){
-       return (await cache.match(request,{ignoreSearch:true})) ||
+       return (await cache.match(canonical)) ||
          (await cache.match('./offline.html')) || Response.error();
      }
    }
    // Versioned static-only cache. No stale user or API responses.
-   const local=await cache.match(request,{ignoreSearch:true});
+   const local=await cache.match(canonical);
    if(local)return local;
    return fetch(request);
  })());

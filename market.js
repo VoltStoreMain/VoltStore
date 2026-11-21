@@ -7,6 +7,87 @@
   const storage='voltmarket-local-drafts-v1';
   let drafts=[],selected='all',filter={q:'',category:'all',city:'',condition:'',maxPrice:'',sort:'newest',attribute:'',attributeValue:''};
   let selectedItem=null,toastTimer;
+  const photos=window.VoltPhotos||null;
+  let photoGeneration=0,photoUrls=[],previewUrls=[],searchTimer=0,savingDraft=false;
+  function clearPhotos(){
+    photoGeneration++;
+    for(const url of photoUrls)URL.revokeObjectURL(url);
+    photoUrls=[];
+  }
+  function clearPreview(){
+    for(const url of previewUrls)URL.revokeObjectURL(url);
+    previewUrls=[];
+    if($('photoPreview'))$('photoPreview').replaceChildren();
+  }
+  function previewSelected(){
+    clearPreview();
+    const input=$('formPhotos'),area=$('photoPreview'),hint=$('photoHint');
+    const files=Array.from(input.files||[]);
+    if(!photos||!files.length){hint.textContent='Фото сжимаются и сохраняются только на твоём устройстве. Не загружаются на сайт.';return;}
+    if(files.length>photos.LIMIT){
+      hint.textContent='Выбери максимум 4 снимка — лишние фотографии не будут сохранены.';
+      input.value='';return;
+    }
+    try{
+      files.forEach(photos.validateFile);
+    }catch(e){hint.textContent=e.message;input.value='';return;}
+    for(const file of files){
+      const url=URL.createObjectURL(file);
+      previewUrls.push(url);
+      const img=document.createElement('img');
+      img.src=url;img.alt='Выбранное фото: '+file.name.slice(0,80);img.loading='lazy';img.decoding='async';
+      area.appendChild(img);
+    }
+    hint.textContent='Выбрано '+files.length+' из 4. При сохранении фото будут сжаты и останутся на этом устройстве.';
+  }
+  async function hydrateCovers(items){
+    if(!photos)return;
+    const generation=photoGeneration;
+    const nodes=[...$('listingGrid').querySelectorAll('[data-photo-id]')];
+    const fetchCover=async(node)=>{
+      if(generation!==photoGeneration||!node.isConnected)return;
+      try{
+        const blob=await photos.first(node.dataset.photoId);
+        if(generation!==photoGeneration||!node.isConnected||!blob)return;
+        const url=URL.createObjectURL(blob);photoUrls.push(url);
+        const image=document.createElement('img');image.src=url;image.alt='Фотография товара из локального черновика';
+        image.loading='lazy';image.decoding='async';image.className='listing-photo';
+        node.prepend(image);
+      }catch(_){/* no images or IndexedDB disabled: keep category illustration */}
+    };
+    if('IntersectionObserver' in window){
+      const observer=new IntersectionObserver((entries,obs)=>{
+        for(const entry of entries)if(entry.isIntersecting){obs.unobserve(entry.target);fetchCover(entry.target);}
+      },{rootMargin:'180px'});
+      nodes.forEach(node=>observer.observe(node));
+    }else nodes.forEach(fetchCover);
+  }
+  async function hydrateGallery(item){
+    if(!photos||item.kind!=='draft')return;
+    const generation=photoGeneration,area=$('detailGallery'),thumbs=$('galleryThumbs');
+    if(!area||!thumbs)return;
+    try{
+      const blobs=await photos.list(item.id);
+      if(!blobs.length||generation!==photoGeneration||!area.isConnected)return;
+      const urls=blobs.map(b=>URL.createObjectURL(b));photoUrls.push(...urls);
+      area.replaceChildren();
+      const main=document.createElement('img');main.src=urls[0];main.alt='Фото товара: '+item.title;
+      main.decoding='async';main.className='gallery-main';
+      area.appendChild(main);thumbs.replaceChildren();
+      urls.forEach((url,i)=>{
+        const button=document.createElement('button');button.type='button';button.className='gallery-thumb';
+        button.setAttribute('aria-label','Посмотреть фото '+(i+1));button.setAttribute('aria-pressed',String(i===0));
+        const image=document.createElement('img');image.src=url;image.alt='';image.loading='lazy';
+        button.appendChild(image);
+        button.addEventListener('click',()=>{
+          main.src=url;
+          thumbs.querySelectorAll('button').forEach((b,index)=>b.setAttribute('aria-pressed',String(index===i)));
+        });
+        thumbs.appendChild(button);
+      });
+    }catch(_){/* device storage unavailable: illustration remains */}
+  }
+
   function notify(s){
     const t=$('notice');t.textContent=s;t.hidden=false;
     clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.hidden=true,3400);

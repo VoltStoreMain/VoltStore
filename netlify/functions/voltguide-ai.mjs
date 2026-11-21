@@ -9,7 +9,8 @@ function validate(payload){
   if(!categories.has(payload.category)||!modes.has(payload.mode))return null;
   const question=text(payload.question,451).replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g,'[email скрыт]').replace(/(?:\+?\d[\s()\-]*){9,}/g,'[номер скрыт]');
   if(!question||question.length>450)return null;
-  const model=text(payload.model,80),price=text(payload.price,30);
+  const model=text(payload.model,80).replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g,'[email скрыт]').replace(/(?:\+?\d[\s()\-]*){9,}/g,'[номер скрыт]');
+  const price=/^[0-9 .\u00a0\u202f₸]{0,30}$/.test(String(payload.price||''))?text(payload.price,30):'';
   const raw=payload.flags||{};
   const flags={hasCriticalIssues:raw.hasCriticalIssues===true,
     issueCount:Number.isInteger(raw.issueCount)&&raw.issueCount>=0&&raw.issueCount<=11?raw.issueCount:0,

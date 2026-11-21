@@ -48,3 +48,13 @@ test('Legacy smartphone resale and original VoltCheck remain',()=>{
  assert.ok(read('app.js').includes('voltcheck.html'));
  assert.ok(fs.existsSync(path.join(root,'voltcheck.html')));
 });
+
+test('seller can draft category passport claims locally only',()=>{
+ const js=read('market.js'),pass=read('passport-app.js');
+ assert.ok(js.includes('saveDraftClaims'));
+ assert.ok(js.includes('saveDraftClaims(item.id)'));
+ assert.ok(js.includes('localStorage.setItem'));
+ assert.ok(js.includes('data-draft-claim'));
+ assert.ok(pass.includes('item.claims'));
+ assert.ok(!js.includes("SB.from('ad_passports')"));
+});

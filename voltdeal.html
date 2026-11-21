@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#090e19">
+  <meta name="description" content="VoltDeal Beta — безопасная демонстрация заявки, подтверждения условий, самостоятельной проверки и передачи товара.">
+  <title>VoltDeal — оформление сделки | VoltStore</title>
+  <link rel="stylesheet" href="market.css">
+  <link rel="stylesheet" href="voltdeal.css">
+  <script defer src="passport-core.js"></script>
+  <script defer src="market-core.js"></script>
+  <script defer src="voltdeal-core.js"></script>
+  <script defer src="voltdeal.js"></script>
+</head>
+<body>
+<header class="header"><div class="shell header-inner">
+  <a class="brand" href="./" aria-label="VoltStore — главная"><span class="mark">V</span><span>VOLT<strong>STORE</strong></span></a>
+  <nav aria-label="Разделы"><a class="nav-link" href="market.html">VoltMarket</a><a class="nav-link" href="voltguide.html">VoltGuide</a><a class="nav-link active" href="voltdeal.html" aria-current="page">VoltDeal</a></nav>
+</div></header>
+<main class="shell deal-shell">
+  <section class="deal-hero">
+    <a class="back-link" id="backItem" href="market.html">← Назад к товару</a>
+    <span class="eyebrow">VOLTDEAL / БЕЗОПАСНОЕ ЗНАКОМСТВО СО СДЕЛКОЙ</span>
+    <h1>Проверь. Договорись. <span>Забери.</span></h1>
+    <p>Покупатель и продавец последовательно подтверждают условия и получение товара. Важно: это <strong>учебный симулятор</strong>, а не реальная бронь, чат или оплата.</p>
+    <div class="deal-warning"><strong>ДЕМО · Денежных операций нет.</strong> Заявки видны только в этом браузере, роли переключаются для тестирования и никого не уведомляют. Не вводите контакты, адреса, номера документов, банковские данные или полный IMEI.</div>
+  </section>
+  <div id="missingItem" class="panel" hidden>
+    <h2>Выбери товар, чтобы проверить покупку</h2>
+    <p>Сначала открой демонстрационную карточку. Вот несколько вариантов:</p>
+    <div id="examples" class="example-grid"></div>
+  </div>
+  <div id="dealContent" hidden>
+    <section id="itemSummary" class="deal-item" aria-label="Товар"></section>
+    <section class="deal-grid">
+      <div class="panel transaction">
+        <div class="section-top">
+          <div><span class="eyebrow">СЦЕНАРИЙ ПОКУПКИ</span><h2>Оформление VoltDeal</h2><p>Две роли. Один понятный порядок действий.</p></div>
+          <span class="beta-label">Локальная симуляция</span>
+        </div>
+        <div id="progress" class="deal-progress" aria-label="Этапы сделки"></div>
+        <div class="role-picker">
+          <div><strong>Кем ты сейчас смотришь?</strong><small>Переключатель только для проверки интерфейса</small></div>
+          <div class="role-buttons" id="roles" role="group" aria-label="Тестовая роль">
+            <button data-role="buyer" class="role-btn active" type="button" aria-pressed="true">🛒 Покупатель</button>
+            <button data-role="seller" class="role-btn" type="button" aria-pressed="false">📦 Продавец</button>
+          </div>
+        </div>
+        <div id="statusBox" class="status-box" role="status" aria-live="polite"></div>
+        <div id="actionContent" class="action-content"></div>
+        <div id="resetArea" class="reset-area" hidden>
+          <button id="resetScenario" type="button" class="subtle">Начать новую демонстрацию</button>
+        </div>
+      </div>
+      <aside class="panel safety">
+        <span class="eyebrow">ПЕРЕДАЧА БЕЗ СЮРПРИЗОВ</span>
+        <h2>Перед сделкой — три проверки</h2>
+        <div class="safety-card"><div class="safety-icon">📋</div><div><strong>VoltPassport</strong><p>Сверь заявленное состояние с тем, что увидишь лично.</p><a id="passportLink" href="voltpassport.html?demo=1">Посмотреть паспорт ↗</a></div></div>
+        <div class="safety-card"><div class="safety-icon">✦</div><div><strong>VoltGuide</strong><p>Подготовь конкретные вопросы и уточни риски.</p><a id="guideLink" href="voltguide.html">Получить подсказки ↗</a></div></div>
+        <div class="safety-card"><div class="safety-icon">🛡</div><div><strong>VoltCheck</strong><p>Проверь устройство или вещь по пунктам перед передачей денег.</p><a id="checkLink" href="voltcheck-all.html">Начать осмотр ↗</a></div></div>
+        <div id="inspectionInfo" class="inspection-info"></div>
+        <div class="safety-tip"><strong>Что важно помнить</strong><p>Для личной встречи лучше выбрать общественное место. Не переводите незнакомому продавцу предоплату. VoltStore не является стороной этой демонстрационной сделки, не получает деньги и не подтверждает их передачу.</p></div>
+      </aside>
+    </section>
+    <section class="history-panel panel" aria-label="История заявки">
+      <div class="history-head"><div><span class="eyebrow">ПРОЗРАЧНОСТЬ ПРОЦЕССА</span><h2>История действий</h2></div>
+      <button id="downloadReceipt" type="button" class="outline">Сохранить памятку .txt</button></div>
+      <div id="history" class="history" aria-live="polite"></div>
+      <p class="fine">Отметки — имитация действий в текущем браузере. История не удостоверяет личность, оплату или фактическую передачу товара.</p>
+    </section>
+    <section class="deal-faq">
+      <h2>Чего пока нет в этой версии?</h2>
+      <div class="faq-grid">
+        <div><strong>Нет настоящей брони</strong><p>Другие покупатели и продавцы не видят эти действия. Нельзя гарантировать наличие товара.</p></div>
+        <div><strong>Нет оплаты внутри VoltStore</strong><p>Не собираем данные карты, не удерживаем деньги и не создаём платёжных ссылок.</p></div>
+        <div><strong>Нет настоящего чата или доставки</strong><p>Окончательное согласование потребуется только после запуска защищённого серверного процесса.</p></div>
+      </div>
+    </section>
+  </div>
+  <footer>VoltDeal Beta · Без оформления заказов и платежей · <a href="market.html">К товарам</a></footer>
+</main>
+<div id="toastDeal" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

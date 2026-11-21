@@ -1,12 +1,15 @@
-name: VoltPassport checks
+name: VoltStore universal inspections
 on:
   push:
-    branches: [feature/voltpassport-v1]
+    branches:
+      - feature/voltpassport-v1
+      - feature/voltstore-universal-inspections
   pull_request:
     paths:
       - 'passport-*.js'
       - 'voltpassport.*'
-      - 'tests/voltpassport-core.test.cjs'
+      - 'voltcheck-all.*'
+      - 'tests/*.test.cjs'
       - '.github/workflows/voltpassport.yml'
 jobs:
   checks:
@@ -22,5 +25,6 @@ jobs:
         run: |
           node --check passport-core.js
           node --check passport-app.js
-      - name: Domain unit tests
-        run: node --test tests/voltpassport-core.test.cjs
+          node --check voltcheck-all.js
+      - name: Check domain logic and integration structure
+        run: node --test tests/*.test.cjs

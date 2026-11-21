@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#090f1c">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="description" content="VoltPassport — паспорт состояния подержанного смартфона со слов продавца и возможностью проверки покупателем.">
+  <meta name="description" content="VoltPassport — прозрачный паспорт состояния смартфона, ноутбука, мебели или велосипеда со слов продавца и проверка покупателем.">
   <title>VoltPassport — паспорт состояния товара</title>
   <link rel="stylesheet" href="voltpassport.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -25,18 +25,22 @@
     </div>
     <div id="notice" class="notice" role="status" aria-live="polite">Загружаем данные…</div>
     <div id="mainContent" hidden>
+      <section class="category-panel card" id="categoryChooser" hidden aria-label="Выбор категории для демонстрации">
+        <div><div class="kicker">ДЕМО / УНИВЕРСАЛЬНЫЙ ПАСПОРТ</div><label for="categorySelect">Что проверяем?</label><p id="categorySummary" class="muted">Категории используют разные проверки.</p></div>
+        <select id="categorySelect" aria-label="Категория товара"></select>
+      </section>
       <div class="product card">
-        <div><div class="kicker">ПАСПОРТ ОБЪЯВЛЕНИЯ <span id="demoTag" class="demo-tag" hidden>ДЕМО</span></div><h2 id="productTitle">Смартфон</h2><div class="meta"><span id="productCity">Город не указан</span><span class="separator">·</span><span id="productDate">Паспорт ещё не создан</span></div></div>
+        <div><div class="kicker"><span id="categoryName">📱 Смартфон</span> · ПАСПОРТ ОБЪЯВЛЕНИЯ <span id="demoTag" class="demo-tag" hidden>ДЕМО</span></div><h2 id="productTitle">Смартфон</h2><div class="meta"><span id="productCity">Город не указан</span><span class="separator">·</span><span id="productDate">Паспорт ещё не создан</span></div></div>
         <div class="price" id="productPrice"></div>
       </div>
       <div class="trustline"><span class="trust-icon">!</span><span><strong>Это не сертификат и не гарантия VoltStore.</strong> Отметки добавляет продавец. Полный IMEI, документы и персональные данные здесь не публикуются. Проверяй устройство лично до оплаты.</span></div>
       <section class="overview" aria-label="Сводка"><div class="stat card"><div class="stat-number" id="statFilled">0/11</div><div class="stat-label">Пунктов заполнено продавцом</div></div><div class="stat card"><div class="stat-number" id="statIssues">0</div><div class="stat-label">Заявлено замечаний</div></div><div class="stat card"><div class="stat-number" id="statCompare">—</div><div class="stat-label">Расхождений с моей проверкой</div></div></section>
       <div class="section-head"><div><span class="kicker">01 / СОСТОЯНИЕ</span><h2>Проверка по пунктам</h2><p class="muted">У продавца и покупателя — отдельные отметки. Отсутствие отметки не означает исправности.</p></div><button class="ghost" id="btnVoltcheck" type="button">🛡️ Открыть VoltCheck ↗</button></div>
       <div id="checksList" class="checks" role="group" aria-label="Проверки состояния"></div>
-      <div id="sellerActions" class="seller-actions card" hidden><div><strong>Сохрани сведения о состоянии</strong><p>После сохранения они станут доступны посетителям активного объявления. История изменений в v1 не хранится.</p></div><button id="savePassport" type="button" class="primary">Сохранить паспорт</button></div>
+      <div id="sellerActions" class="seller-actions card" hidden><div><strong>Сохрани сведения о состоянии</strong><p>В демонстрации сведения сохраняются только в этой вкладке. В реальном объявлении публикация возможна только после настройки и проверки базы данных.</p></div><button id="savePassport" type="button" class="primary">Сохранить паспорт</button></div>
       <div class="result card" id="comparisonResult" aria-live="polite"><span class="kicker">02 / РЕЗУЛЬТАТ</span><h3 id="resultTitle">Начните со своей проверки</h3><p id="resultText" class="muted"></p><div id="resultNotes" class="result-notes"></div></div>
-      <div class="footer-actions"><button id="copyLink" class="ghost" type="button">Копировать ссылку</button><button id="printPassport" class="ghost" type="button">Распечатать</button><a class="ghost" href="./#resale">Вернуться к объявлениям</a></div>
-      <p class="legal">VoltPassport v1 · Сведения о товаре со слов продавца. Результаты покупателя сохраняются только в этой вкладке браузера и не отправляются продавцу или на сервер. При сомнениях проверьте документы, состояние и статус IMEI через официальный источник.</p>
+      <div class="footer-actions"><button id="copyLink" class="ghost" type="button">Копировать ссылку</button><button id="printPassport" class="ghost" type="button">Распечатать</button><button id="downloadReport" class="ghost" type="button">Скачать отчёт .txt</button><a class="ghost" href="./#resale">Вернуться к объявлениям</a></div>
+      <p class="legal">VoltPassport v2 · Сведения о товаре со слов продавца. Результаты покупателя сохраняются только в этой вкладке браузера и не отправляются продавцу или на сервер. Отчёт составлен пользователями, не является экспертизой или подтверждением подлинности. Проверяйте товар до оплаты. Для смартфонов сверяйте IMEI с официальным источником.</p>
     </div>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>

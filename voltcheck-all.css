@@ -1,0 +1,10 @@
+.setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) minmax(0,1fr);gap:14px;padding:22px;margin:0 0 24px}
+.setup-field{min-width:0}.setup-field label{display:block;color:#c9dce9;font-size:12px;font-weight:750;letter-spacing:.03em;margin-bottom:8px}
+.field{display:block;width:100%;background:#0c1928;border:1px solid #47637a;border-radius:11px;color:#e9f8ff;padding:12px 13px;min-height:46px;outline-offset:2px}
+.field::placeholder{color:#7d94a5}.workflow{display:flex;justify-content:space-between;gap:18px;align-items:end;margin:25px 0 15px}.workflow h2{margin:4px 0 5px;font-size:26px;line-height:1.2}.workflow p{margin:0;font-size:13px}
+.progress-track{height:8px;border-radius:999px;background:#233649;overflow:hidden;margin:14px 0 23px}.progress-track #progressFill{width:0;height:100%;background:linear-gradient(90deg,#56d7a6,#75bfff);transition:width .2s}
+.check .check-grid{grid-template-columns:1fr;margin-left:47px}.check .check-col{padding:15px}.check .col-label{font-size:12px}.choices{gap:8px}.choice{padding:10px 14px}.note-input{font-size:13px;min-height:50px;margin-top:12px}
+.result h2{font-size:25px;margin:7px 0}.result{border-color:#465d70}
+#reset{margin-left:auto}
+@media(max-width:760px){.setup{grid-template-columns:1fr;gap:12px}.workflow{align-items:stretch;flex-direction:column}.workflow .ghost{align-self:flex-start}.check .check-grid{margin-left:0}#reset{margin-left:0}}
+@media print{.setup,.progress-track,.workflow>a,.footer-actions,.topbar{display:none!important}.check-grid{margin-left:0!important}.note-input{display:none}.check-grid .status-display{display:block}}

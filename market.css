@@ -18,3 +18,11 @@ body[data-view="detail"] #hero,body[data-view="detail"] .steps,body[data-view="d
 @media(max-width:790px){.header-inner{padding:9px 0;align-items:start;flex-direction:column}.header nav{justify-content:flex-start}.hero{padding:38px 0 27px}.steps{gap:14px}.steps .arrow{display:none}.steps>div{flex-basis:calc(33.3% - 18px)}.categories{grid-template-columns:repeat(3,minmax(0,1fr))}.listings{grid-template-columns:repeat(2,minmax(0,1fr))}.detail-summary{grid-template-columns:1fr}.finish{flex-direction:column;align-items:start}.detail-heading{flex-direction:column}.detail-heading .big-price{font-size:25px}}
 @media(max-width:520px){.shell{width:calc(100% - 26px)}.header nav{gap:3px}.nav-link{padding:7px 8px;font-size:11px}.brand{font-size:18px}.mark{width:31px;height:31px}.hero h1{font-size:40px}.hero p{font-size:15px}.hero-cta>*{width:100%}.steps{padding:15px}.steps>div{flex:1 1 calc(50% - 16px)}.categories{grid-template-columns:repeat(2,minmax(0,1fr))}.category-button{font-size:12px;padding:12px}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.filters .wide{grid-column:1/-1}.listings{grid-template-columns:1fr}.illustration{height:146px}.listing h3{min-height:auto}.section-top{align-items:start;flex-direction:column}.panel{padding:18px}.journey{grid-template-columns:1fr}.claims{grid-template-columns:1fr}.specs{grid-template-columns:1fr 1fr}.decision{grid-template-columns:1fr}.form-grid,.dynamic-fields{grid-template-columns:1fr}.form-actions>*{width:100%}.form-grid .full{grid-column:auto}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* Contextual purchase entry: only on the listing detail, not in global navigation. */
+.deal-entry{margin-top:19px;padding:17px;border-radius:14px;background:linear-gradient(125deg,#183e43,#152c40);border:1px solid #407f70}
+.deal-entry h3{margin:7px 0 5px;font-size:23px;letter-spacing:-.02em}
+.deal-entry .primary{display:flex;justify-content:space-between;text-align:center;margin:13px 0 9px}
+.deal-entry p{font-size:12px;margin:5px 0;color:#b3cdd4}
+.deal-entry .fine{font-size:11px;color:#a4b5c8}

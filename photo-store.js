@@ -54,9 +54,10 @@
    const url=URL.createObjectURL(file);
    try{
      const img=new Image();
-     img.src=url;
-     if(typeof img.decode==='function')await img.decode();
-     else await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;});
+     await new Promise((resolve,reject)=>{
+       img.onload=resolve;img.onerror=()=>reject(new Error('Фотография не открывается в этом браузере.'));
+       img.src=url;
+     });
      return {width:img.naturalWidth,height:img.naturalHeight,
        draw:(ctx,w,h)=>{ctx.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);}};
    }catch(err){URL.revokeObjectURL(url);throw err;}

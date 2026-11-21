@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090e19">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="VoltMarket Beta — универсальные объявления и проверка товаров перед покупкой. Демонстрационный прототип без реальных продаж.">
+  <title>VoltMarket Beta — товары и проверка | VoltStore</title>
+  <link rel="stylesheet" href="market.css">
+  <script defer src="passport-core.js"></script>
+  <script defer src="market-core.js"></script>
+  <script defer src="market.js"></script>
+</head>
+<body>
+  <header class="header">
+    <div class="shell header-inner">
+      <a class="brand" href="./" aria-label="Главная VoltStore"><span class="mark">V</span><span>VOLT<strong>STORE</strong></span></a>
+      <nav aria-label="Разделы">
+        <a class="nav-link" href="./#resale">Б/у смартфоны</a>
+        <a class="nav-link active" href="market.html" aria-current="page">VoltMarket</a>
+        <a class="nav-link" href="voltcheck-all.html">VoltCheck</a>
+        <a class="nav-link" href="voltguide.html">VoltGuide</a>
+      </nav>
+    </div>
+  </header>
+  <main class="shell">
+    <section class="hero" id="hero">
+      <div class="eyebrow">VOLTSTORE / MARKETPLACE BETA <span class="dot"></span> УМНЫЙ ВЫБОР Б/У ВЕЩЕЙ</div>
+      <h1>Меньше догадок.<br><span>Больше ясности.</span></h1>
+      <p>Находи товар, изучай состояние, уточняй риски с VoltGuide и проверяй сам через VoltCheck. Каждый инструмент появляется в нужный момент.</p>
+      <div class="hero-cta"><button id="heroExplore" type="button" class="primary">Смотреть товары <span aria-hidden="true">→</span></button><button type="button" id="heroDraft" class="outline">＋ Создать черновик</button></div>
+      <div class="honesty"><strong>Это тестовая витрина.</strong> Примеры товаров и цены вымышлены. Черновики видны только в этом браузере; оплата, связь с продавцом и публикация отключены.</div>
+    </section>
+    <section class="steps" aria-label="Путь покупателя">
+      <div><span class="step-num">01</span><strong>Найти товар</strong><small>Категория и фильтры</small></div>
+      <span class="arrow" aria-hidden="true">›</span>
+      <div><span class="step-num">02</span><strong>Понять состояние</strong><small>Сведения продавца</small></div>
+      <span class="arrow" aria-hidden="true">›</span>
+      <div><span class="step-num">03</span><strong>Оценить риски</strong><small>VoltGuide</small></div>
+      <span class="arrow" aria-hidden="true">›</span>
+      <div><span class="step-num">04</span><strong>Проверить лично</strong><small>VoltCheck</small></div>
+      <span class="arrow" aria-hidden="true">›</span>
+      <div><span class="step-num">05</span><strong>Принять решение</strong><small>Без спешки и предоплат</small></div>
+    </section>
+    <section id="discover" class="discover" aria-labelledby="discoverTitle">
+      <div class="section-top"><div><span class="eyebrow">ПОДБОР ТОВАРА</span><h2 id="discoverTitle">Что ищем?</h2><p>У каждой категории — собственные характеристики и проверки.</p></div><span class="beta-label">Локальная демонстрация</span></div>
+      <div id="categoryTabs" class="categories" role="group" aria-label="Категории товаров"></div>
+      <div class="search-panel">
+        <div class="filters">
+          <label class="wide">Поиск<input id="search" placeholder="Название, материал, характеристики…" maxlength="100" autocomplete="off"></label>
+          <label>Город<select id="city"><option value="">Все города</option></select></label>
+          <label>Состояние<select id="condition"><option value="">Любое состояние</option></select></label>
+          <label>Цена до, ₸<input id="maxPrice" type="number" inputmode="numeric" min="1000" max="30000000" placeholder="Без ограничений"></label>
+          <label>Сортировка<select id="sort"><option value="newest">Сначала новые</option><option value="priceAsc">Цена: по возрастанию</option><option value="priceDesc">Цена: по убыванию</option></select></label>
+          <label id="attributeFilterWrap" hidden>Характеристика<select id="attributeFilter"><option value="">Все значения</option></select></label>
+        </div>
+        <div class="filter-bottom"><span id="resultCount" role="status" aria-live="polite">Загрузка примеров…</span><button type="button" id="resetFilters" class="subtle">Сбросить фильтры</button></div>
+      </div>
+      <div id="listingGrid" class="listings" aria-live="polite"></div>
+    </section>
+    <section id="detailView" class="detail" aria-labelledby="detailTitle" hidden>
+      <button id="backToResults" class="back-link" type="button">← Вернуться к поиску</button>
+      <div id="detailContent"></div>
+    </section>
+    <section id="draftView" class="draft" aria-labelledby="draftHeading" hidden>
+      <button type="button" id="backFromDraft" class="back-link">← Вернуться к товарам</button>
+      <div class="section-top"><div><span class="eyebrow">ВЕРСИЯ ДЛЯ ПРОДАВЦА · БЕЗ ПУБЛИКАЦИИ</span><h2 id="draftHeading">Создай черновик товара</h2><p>Проверь, насколько удобна универсальная форма. Все данные останутся локально в твоём браузере.</p></div></div>
+      <form id="draftForm" class="draft-form">
+        <div class="form-grid">
+          <label>Категория<select id="formCategory" required></select></label>
+          <label>Название товара<input id="formTitle" required minlength="4" maxlength="90" placeholder="Например, Lenovo ThinkPad T14"></label>
+          <label>Цена, ₸<input id="formPrice" required type="number" min="1000" max="30000000" inputmode="numeric" placeholder="Цена"></label>
+          <label>Город<input id="formCity" required minlength="2" maxlength="40" placeholder="Например, Алматы"></label>
+          <label>Состояние<select id="formCondition" required></select></label>
+          <div id="dynamicFields" class="dynamic-fields" aria-label="Характеристики выбранной категории"></div>
+          <label class="full">Честное описание состояния<textarea id="formNote" rows="4" maxlength="500" placeholder="Укажи дефекты, ремонты и вопросы для проверки. Не вводи телефон, адрес, документы или IMEI."></textarea></label>
+        </div>
+        <div class="draft-hint">Внимание: сохранение черновика <strong>не публикует объявление</strong> и не делает его видимым другим людям. Фото и личные данные не собираются.</div>
+        <div class="form-actions"><button class="primary" type="submit">Сохранить черновик <span aria-hidden="true">→</span></button><button class="outline" type="reset">Очистить форму</button></div>
+      </form>
+      <p id="formMessage" role="status" aria-live="polite" class="form-message"></p>
+    </section>
+    <section class="finish">
+      <div><span class="eyebrow">НАША РАЗНИЦА</span><h2>Не просто список объявлений — инструменты принятия решения.</h2><p>VoltMarket объединяет описание товара, проверяемые вопросы и собственный осмотр. Но ни одна отметка не является гарантией исправности, честности продавца или безопасности оплаты.</p></div>
+      <a href="voltguide.html" class="outline">✦ Как работает VoltGuide</a>
+    </section>
+    <footer>VoltStore · Универсальная витрина Beta. <a href="./">Главная</a> · <a href="voltcheck-all.html">VoltCheck</a> · <a href="voltpassport.html?demo=1">VoltPassport Demo</a></footer>
+  </main>
+  <div id="notice" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

@@ -9,6 +9,16 @@
   const rawAdId = params.get('ad') || '';
   const adId = /^[\w-]{1,80}$/.test(rawAdId) ? rawAdId : '';
   const mockId = adId || 'sample-product';
+  const market=window.VoltMarketCore;
+  function linkedMarketListing(){
+    if(!isDemo||!market||!adId)return null;
+    const example=market.samples().find(x=>x.id===adId);
+    if(example)return example;
+    try{
+      const raw=JSON.parse(localStorage.getItem('voltmarket-local-drafts-v1')||'[]');
+      return Array.isArray(raw)?raw.slice(0,30).map(market.normalize).find(x=>x&&x.kind==='draft'&&x.id===adId)||null:null;
+    }catch(_){return null;}
+  }
   let category = isDemo ? core.resolveCategory(params.get('category')) : 'smartphone';
   const sessionKey = () => 'voltpassport-buyer-v2:' + mockId + ':' + category;
   const sellerDrafts = Object.create(null);
@@ -97,10 +107,11 @@
     });
   }
   function importVoltCheck() {
-    const sourceKey=category==='smartphone'?VOLTCHECK_KEY:('voltcheck-universal-v1:'+category+':'+mockId);
-    const saved=safeSessionRead(sourceKey);
+    const universal=safeSessionRead('voltcheck-universal-v1:'+category+':'+mockId);
+    const legacy=category==='smartphone'?safeSessionRead(VOLTCHECK_KEY):null;
+    const saved=universal&&universal.state?universal:legacy;
     if(!saved||!saved.state)return false;
-    const incoming=category==='smartphone'?core.normalizeVoltCheck(saved):core.normalize(saved.state,category);
+    const incoming=saved===legacy?core.normalizeVoltCheck(saved):core.normalize(saved.state,category);
     let imported=false;
     core.getChecks(category).forEach(c=>{
       if(buyerState[c.id].status==='unknown'&&incoming[c.id].status!=='unknown'){
@@ -125,7 +136,8 @@
     $('productDate').textContent=passport?.updated_at?'Обновлён '+formatDate(passport.updated_at):'Паспорт ещё не опубликован';
     $('demoTag').hidden=!isDemo;
     const query=new URLSearchParams({ad:isDemo?mockId:ad.id,model:ad.model,price:String(ad.price||''),category});
-    $('btnVoltcheck').onclick=()=>{location.href=(category==='smartphone'?'voltcheck.html':'voltcheck-all.html')+'?'+query.toString();};
+    $('btnVoltcheck').onclick=()=>{location.href='voltcheck-all.html?'+query.toString();};
+    const guide=$('openGuide');if(guide)guide.href='voltguide.html?'+query.toString();
   }
   function bindEvents() {
     $('checksList').addEventListener('click',event=>{
@@ -208,17 +220,20 @@
   async function boot() {
     bindEvents();
     if(isDemo){
+      const item=linkedMarketListing();
+      if(item)category=item.category;
       const c=core.getCategory(category);
-      ad={id:mockId,model:core.clean(params.get('model'),80)||c.example,price:Number(params.get('price'))||0,city:'Демонстрация',status:'active'};
+      ad=item?{id:item.id,model:item.title,price:item.price,city:item.city,status:'active'}
+        :{id:mockId,model:core.clean(params.get('model'),80)||c.example,price:Number(params.get('price'))||0,city:'Демонстрация',status:'active'};
       const saved=safeSessionRead(demoKey());
-      passport=saved||{updated_at:new Date().toISOString(),answers:exampleAnswers(category)};
-      editable=true;sellerState=core.normalize(passport.answers,category);loadBuyer();
-      $('categoryChooser').hidden=false;
+      passport=item?{updated_at:new Date().toISOString(),answers:item.claims}:saved||{updated_at:new Date().toISOString(),answers:exampleAnswers(category)};
+      editable=!item;sellerState=core.normalize(passport.answers,category);loadBuyer();
+      $('categoryChooser').hidden=!!item;
       $('categorySelect').replaceChildren();
       core.CATEGORY_IDS.forEach(key=>{const option=el('option','',core.getCategory(key).icon+' '+core.getCategory(key).label);option.value=key;$('categorySelect').appendChild(option);});
       $('categorySelect').value=category;
       $('categorySummary').textContent=c.subtitle;
-      setNotice('ДЕМО · Здесь показан учебный пример. Данные сохраняются только в этой вкладке и не связаны с реальными объявлениями.','warn');
+      setNotice(item?'ДЕМО · Сведения со слов условного продавца загружены из карточки VoltMarket. Это не экспертиза и не реальное опубликованное предложение.':'ДЕМО · Здесь показан учебный пример. Данные сохраняются только в этой вкладке и не связаны с реальными объявлениями.','warn');
       fillProduct();renderChecks();$('mainContent').hidden=false;return;
     }
     if(!adId){setNotice('Откройте паспорт из объявления VoltResale. Для изучения интерфейса доступен демонстрационный пример по ссылке ?demo=1.','warn');return;}

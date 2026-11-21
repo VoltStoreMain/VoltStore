@@ -7,7 +7,7 @@ const modes=new Set(['buy','sell','inspect']);
 function validate(payload){
   if(!payload||typeof payload!=='object'||Array.isArray(payload))return null;
   if(!categories.has(payload.category)||!modes.has(payload.mode))return null;
-  const question=text(payload.question,451);
+  const question=text(payload.question,451).replace(/[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}/g,'[email скрыт]').replace(/(?:\\+?\\d[\\s()\\-]*){9,}/g,'[номер скрыт]');
   if(!question||question.length>450)return null;
   const model=text(payload.model,80),price=text(payload.price,30);
   const raw=payload.flags||{};

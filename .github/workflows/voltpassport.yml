@@ -8,6 +8,7 @@ on:
       - feature/voltmarket-unified-flow
       - feature/voltdeal-buying-flow
       - feature/mobile-first-marketplace
+      - feature/pwa-performance-photos
   pull_request:
     paths:
       - 'passport-*.js'
@@ -17,6 +18,13 @@ on:
       - 'market*'
       - 'voltdeal*'
       - 'mobile-shell*'
+      - 'pwa-client.js'
+      - 'photo-store.js'
+      - 'sw.js'
+      - 'offline.html'
+      - 'manifest.webmanifest'
+      - 'icons/*'
+      - 'universal-landing.css'
       - 'passport-app.js'
       - 'index.html'
       - 'netlify/functions/voltguide-ai.mjs'
@@ -44,6 +52,9 @@ jobs:
           node --check voltdeal-core.js
           node --check voltdeal.js
           node --check mobile-shell.js
+          node --check pwa-client.js
+          node --check photo-store.js
+          node --check sw.js
           node --check netlify/functions/voltguide-ai.mjs
       - name: Check domain logic and integration structure
         run: node --test tests/*.test.cjs tests/*.test.mjs

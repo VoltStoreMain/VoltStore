@@ -226,7 +226,7 @@
       ad=item?{id:item.id,model:item.title,price:item.price,city:item.city,status:'active'}
         :{id:mockId,model:core.clean(params.get('model'),80)||c.example,price:Number(params.get('price'))||0,city:'Демонстрация',status:'active'};
       const saved=safeSessionRead(demoKey());
-      passport=saved||{updated_at:new Date().toISOString(),answers:item?item.claims:exampleAnswers(category)};
+      passport=item?{updated_at:new Date().toISOString(),answers:item.claims}:saved||{updated_at:new Date().toISOString(),answers:exampleAnswers(category)};
       editable=!item;sellerState=core.normalize(passport.answers,category);loadBuyer();
       $('categoryChooser').hidden=!!item;
       $('categorySelect').replaceChildren();

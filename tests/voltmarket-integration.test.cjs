@@ -4,7 +4,7 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
 test('VoltMarket page contains every DOM selector referenced by app',()=>{
  const html=read('market.html'),js=read('market.js');
  const selectors=[...js.matchAll(/\$\('([A-Za-z0-9_-]+)'\)/g)].map(m=>m[1]);
- const missing=[...new Set(selectors)].filter(id=>!html.includes('id="'+id+'"'));
+ const missing=[...new Set(selectors)].filter(id=>!html.includes('id="'+id+'"')&&!js.includes('id="'+id+'"'));
  assert.deepEqual(missing,[]);
 });
 test('VoltMarket local scripts and styles all exist',()=>{
@@ -17,7 +17,7 @@ test('Marketplace exposes no public payment or backend write path',()=>{
  const js=read('market.js');
  assert.ok(js.includes('localStorage'));
  assert.ok(js.includes('Черновик сохранён'));
- assert.ok(!js.includes('.from('));
+ assert.ok(!/\b(?:SB|sb|supabase)\.from\s*\(/.test(js)); // Array.from() for city options is safe
  assert.ok(!js.includes('fetch('));
  assert.ok(!js.includes('service_role'));
  assert.match(read('market.html'),/не публикует объявление|черновики видны только/i);

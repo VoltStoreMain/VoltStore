@@ -104,6 +104,8 @@
         throw new Error('Подтверждение передачи доступно только после фактической передачи товара.');
       next.status='buyer_confirmed';
     }else{
+      if(event==='seller_confirm'&&(!validObject(options)||options.handoverConfirmed!==true))
+        throw new Error('Продавец должен подтвердить фактическую передачу вещи.');
       next.status={
         seller_accept:'accepted',seller_decline:'declined',buyer_cancel:'cancelled',
         seller_cancel:'cancelled',seller_confirm:'completed'

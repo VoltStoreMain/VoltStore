@@ -141,6 +141,7 @@
       return '<div class="claim"><small>'+esc(x.title)+(x.critical?' · важно':'')+'</small><b class="'+esc(x.status)+'">'+esc(status)+'</b></div>';
     }).join('');
     const guide=core.link(item,'guide'),check=core.link(item,'check'),demoPassport=core.link(item,'passport');
+    const deal=core.link(item,'deal');
     const sellerEditor=isDraft?'<section class="panel" id="draftClaimsEditor"><span class="eyebrow">МОЙ ЛОКАЛЬНЫЙ ПАСПОРТ</span><h2>Отметки владельца черновика</h2>'+
       '<p>Это ваш учебный черновик, не опубликованное удостоверение состояния. Выберите по каждому пункту честный статус. Данные останутся только в браузере.</p>'+
       '<div class="claims">'+passport.getChecks(item.category).map(x=>'<label class="claim"><small>'+esc(x.title)+(x.critical?' · важно':'')+'</small><select data-draft-claim="'+esc(x.id)+'">'+
@@ -153,7 +154,11 @@
       '<div class="spec"><small>Заявленное состояние</small><b>'+esc(item.condition)+'</b></div><div class="spec"><small>Город</small><b>'+esc(item.city)+'</b></div></div></section>'+
       '<aside class="panel"><h2>Сначала факты, потом решение</h2><div class="trust-status"><span>!</span><span><strong>Не сертифицировано VoltStore.</strong><br>Это '+(isDraft?'локальный черновик':'вымышленный пример')+'. Заявления о состоянии не проверены независимым специалистом. Никакие деньги не принимаются.</span></div>'+
       '<p>Начни с описания. Если что-то неясно, уточни у продавца или проведи самостоятельную проверку.</p>'+
-      '<a class="outline" href="'+esc(guide)+'">✦ Спросить VoltGuide</a></aside></div>'+
+      '<a class="outline" href="'+esc(guide)+'">✦ Спросить VoltGuide</a>'+
+      '<div class="deal-entry"><span class="eyebrow">ГОТОВ ПЕРЕЙТИ К ПОКУПКЕ?</span><h3>🤝 VoltDeal</h3>'+
+      '<p>Заявка, согласование, проверка и подтверждение передачи обеими сторонами.</p>'+
+      '<a class="primary" href="'+esc(deal)+'">Попробовать оформление ↗</a>'+
+      '<p class="fine">Демо: продавец не получит заявку, настоящей брони и оплаты нет.</p></div></aside></div>'+
       '<section class="panel"><span class="eyebrow">02 / СВЕДЕНИЯ О СОСТОЯНИИ</span><h2>Что известно со слов продавца?</h2>'+
       '<p>Незаполненные пункты — не подтверждение исправности. Это сведения со слов условного продавца или владельца локального черновика, а не независимая экспертиза.</p>'+
       '<div class="claims">'+statement+'</div>'+

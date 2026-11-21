@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#090e19">
+  <meta name="description" content="VoltCheck — самостоятельная пошаговая проверка подержанного смартфона, ноутбука, мебели или велосипеда перед покупкой.">
+  <title>VoltCheck — проверь товар до покупки</title>
+  <link rel="stylesheet" href="voltpassport.css">
+  <link rel="stylesheet" href="voltcheck-all.css">
+  <script defer src="passport-core.js"></script>
+  <script defer src="voltcheck-all.js"></script>
+</head>
+<body>
+  <header class="topbar"><div class="wrap bar-inner"><a class="logo" href="./#resale" aria-label="VoltStore — объявления"><span class="mark">V</span><span>VOLT<span class="accent">STORE</span></span></a><span class="pill">VOLTCHECK / UNIVERSAL</span><a class="small-link" href="./#resale">← На главную</a></div></header>
+  <main class="wrap page">
+    <section class="hero"><div class="eyebrow"><span class="eyedot"></span> ВСТРЕЧА С ПРОДАВЦОМ · ПОШАГОВЫЙ ОСМОТР</div><h1>Не просто смотри. <span>Проверяй.</span></h1><p class="intro">Пошагово осмотри товар, запиши замечания и забери личный отчёт. Ответы сохраняются только в текущей вкладке. Это не экспертиза и не гарантия сделки.</p></section>
+    <section class="card setup" aria-label="Параметры проверки">
+      <div class="setup-field"><label for="category">Категория</label><select id="category" class="field"></select></div>
+      <div class="setup-field"><label for="model">Товар или модель</label><input id="model" class="field" maxlength="100" autocomplete="off" placeholder="Название товара"></div>
+      <div class="setup-field"><label for="price">Цена в объявлении, ₸</label><input id="price" class="field" inputmode="numeric" type="number" min="0" max="100000000" placeholder="Необязательно"></div>
+    </section>
+    <div class="workflow"><div><span class="kicker">01 / ТОВАР</span><h2 id="categoryTitle">Проверки по категории</h2><p id="categorySubtitle" class="muted"></p></div><a id="openPassport" href="voltpassport.html?demo=1" class="ghost">⇄ Сравнить с паспортом продавца ↗</a></div>
+    <section class="overview" aria-label="Ход проверки"><div class="stat card"><div class="stat-number" id="statChecked">0/11</div><div class="stat-label">Проверено пунктов</div></div><div class="stat card"><div class="stat-number" id="statIssues">0</div><div class="stat-label">Замечаний найдено</div></div><div class="stat card"><div class="stat-number" id="statImportant">0</div><div class="stat-label">Критических замечаний</div></div></section>
+    <div class="progress-track" aria-hidden="true"><div id="progressFill"></div></div>
+    <div id="checksList" class="checks" role="group" aria-label="Осмотр товара"></div>
+    <section class="result card" role="status" aria-live="polite"><span class="kicker">02 / ВЫВОД ПО ВАШИМ ОТМЕТКАМ</span><h2 id="resultTitle">Начните с проверок</h2><p id="resultText" class="muted"></p><div id="resultNotes" class="result-notes"></div></section>
+    <div class="footer-actions"><button type="button" class="primary" id="download">Скачать мой отчёт .txt</button><button type="button" class="ghost" id="print">Распечатать</button><button type="button" class="ghost" id="reset">Очистить проверки</button></div>
+    <p class="legal">VoltCheck Universal · Отметки ставит сам пользователь. Положительный результат не подтверждает подлинность, безопасность и исправность товара. Для проверки смартфонов используйте официальную проверку IMEI. Для сложных дефектов обратитесь к специалисту. Не публикуйте персональные данные в заметках.</p>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

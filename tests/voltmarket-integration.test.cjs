@@ -27,8 +27,8 @@ test('Marketplace clearly labels examples and separate passport experience',()=>
  assert.match(js,/ДЕМО-ПРИМЕР/);
  assert.match(js,/Паспорт состояния|СВЕДЕНИЯ О СОСТОЯНИИ/);
  assert.match(js,/не является гарантией|не сертифицировано|Не сертифицировано/i);
- assert.ok(js.includes('core.link(item,\\'guide\\')'));
- assert.ok(js.includes('core.link(item,\\'check\\')'));
+ assert.ok(js.includes("core.link(item,'guide')"));
+ assert.ok(js.includes("core.link(item,'check')"));
 });
 test('Marketplace entered intentionally from homepage',()=>{
  const index=read('index.html');

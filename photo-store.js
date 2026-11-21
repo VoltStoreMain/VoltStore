@@ -58,8 +58,8 @@
      if(typeof img.decode==='function')await img.decode();
      else await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;});
      return {width:img.naturalWidth,height:img.naturalHeight,
-       draw:(ctx,w,h)=>ctx.drawImage(img,0,0,w,h)};
-   }finally{URL.revokeObjectURL(url);}
+       draw:(ctx,w,h)=>{ctx.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);}};
+   }catch(err){URL.revokeObjectURL(url);throw err;}
  }
  function blobFromCanvas(canvas,q){
    return new Promise((resolve,reject)=>{
@@ -108,11 +108,16 @@
    return (Array.isArray(out)?out:[out]).filter(x=>x&&x.blob instanceof Blob)
      .sort((a,b)=>a.pos-b.pos).map(x=>x.blob);
  }
+ async function first(id){
+   if(!validId(id))return null;
+   const row=await store('readonly',s=>s.get(id+':0'));
+   return row&&row.blob instanceof Blob?row.blob:null;
+ }
  async function remove(id){
    if(!validId(id))return;
    await store('readwrite',s=>Array.from({length:LIMIT},(_,i)=>s.delete(id+':'+i)));
  }
- const api=Object.freeze({LIMIT,MAX_SOURCE,MAX_OUTPUT,MAX_EDGE,TYPES,validateFile,validId,compress,save,list,remove});
+ const api=Object.freeze({LIMIT,MAX_SOURCE,MAX_OUTPUT,MAX_EDGE,TYPES,validateFile,validId,compress,save,list,first,remove});
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
  root.VoltPhotos=api;
 })(typeof window!=='undefined'?window:globalThis);

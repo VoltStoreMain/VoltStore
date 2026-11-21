@@ -1,0 +1,131 @@
+/* VoltStore mobile-first navigation & contextual actions.
+   Shared by VoltMarket, VoltDeal, VoltGuide, VoltCheck Universal and VoltPassport. */
+:root{--vm-nav-height:70px;--vm-action-height:70px}
+#vmMobileNav,#vmStickyAction,#vmMobileIntro,#vmAdvancedFilters{display:none}
+#vmAdvancedFilters[open]{display:contents}
+#vmAdvancedFilters>summary{display:none}
+#vmAdvancedFields{display:contents}
+@media(max-width:760px){
+  html{scroll-padding-top:74px}
+  body{padding-bottom:calc(var(--vm-nav-height) + 15px + env(safe-area-inset-bottom))!important}
+  body.vm-has-sticky{padding-bottom:calc(var(--vm-nav-height) + var(--vm-action-height) + 18px + env(safe-area-inset-bottom))!important}
+  header nav,.header nav,.topbar .right{display:none!important}
+  button,a,input,select,textarea{touch-action:manipulation}
+  input,select,textarea{font-size:16px!important;min-height:46px;max-width:100%}
+  textarea{line-height:1.5;min-height:92px}
+  button,.primary,.outline,.small-button{min-height:44px}
+  :focus-visible{outline:2px solid #75e8bd;outline-offset:3px}
+  #vmMobileNav{position:fixed;z-index:1000;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));left:0;right:0;bottom:0;
+    height:calc(var(--vm-nav-height) + env(safe-area-inset-bottom));
+    padding:5px 7px calc(5px + env(safe-area-inset-bottom));background:#101f30f5;border-top:1px solid #37546b;
+    box-shadow:0 -9px 32px #0309139c;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  #vmMobileNav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    text-decoration:none;color:#adbed0;font-weight:600;font-size:10px;border-radius:12px;min-width:0;min-height:48px;text-align:center}
+  #vmMobileNav a .vm-icon{font-size:22px;line-height:1.05}
+  #vmMobileNav a.vm-selected{background:#1a403e;color:#87f0c7}
+  #vmStickyAction{position:fixed;z-index:999;display:flex;gap:9px;align-items:center;bottom:calc(var(--vm-nav-height) + env(safe-area-inset-bottom));
+    left:0;right:0;min-height:var(--vm-action-height);padding:9px 14px;
+    background:linear-gradient(180deg,#10293a,#0c1c2d);box-shadow:0 -8px 26px #030914a6;border-top:1px solid #45727b}
+  #vmStickyAction[hidden]{display:none!important}
+  #vmStickyAction button{min-height:50px;border-radius:12px;border:0;font-size:14px;font-weight:800;line-height:1.2;cursor:pointer}
+  #vmStickyAction .vm-main{flex:1;background:#7de8bc;color:#052825;text-align:center;padding:10px 13px}
+  #vmStickyAction .vm-secondary{flex:0 0 auto;border:1px solid #567c87;color:#dbfff2;background:#25404d;font-size:12px;padding:10px}
+  /* Marketplace: catalog-first mobile landing, filters disclosed on demand. */
+  body:has(#discover)>.header .header-inner{min-height:61px;padding:8px 0}
+  body:has(#discover) .header .brand{font-size:18px}
+  body:has(#discover) .hero,body:has(#discover) .steps{display:none}
+  #vmMobileIntro{display:block;background:#16333b;border-left:3px solid #75e2b8;border-radius:9px;
+    padding:10px 12px;font-size:11px;color:#c6e8dd;margin:0 0 14px}
+  #discover{padding:20px 0 25px}
+  #discover>.section-top{margin-bottom:14px}
+  #discover .section-top h2{font-size:27px;margin:6px 0 2px}
+  #discover .section-top p{font-size:12px}
+  #discover .beta-label{display:none}
+  #categoryTabs{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;scroll-snap-type:x proximity;
+    margin:0 -1px 13px;padding:1px 1px 9px;overscroll-behavior-inline:contain}
+  #categoryTabs::-webkit-scrollbar{display:none}
+  #categoryTabs .category-button{flex:0 0 auto;min-width:116px;min-height:49px;max-width:166px;
+    padding:10px 12px;font-size:12px;scroll-snap-align:start}
+  #categoryTabs .category-button span{font-size:20px}
+  #discover .search-panel{padding:13px;border-radius:15px}
+  #discover .filters{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+  #discover .filters>label:first-child{grid-column:1/-1}
+  #discover .filters>label:first-child input{height:51px;border-radius:12px}
+  #vmAdvancedFilters{grid-column:1/-1;display:block;margin-top:5px}
+  #vmAdvancedFilters:not([open]) #vmAdvancedFields{display:none}
+  #vmAdvancedFilters>summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;
+    min-height:44px;padding:6px 1px 0;color:#83eac3;font-size:13px;font-weight:750}
+  #vmAdvancedFilters>summary::-webkit-details-marker{display:none}
+  #vmAdvancedFilters>summary::after{content:'⌄';font-size:20px;line-height:1.1}
+  #vmAdvancedFilters[open]>summary::after{transform:rotate(180deg)}
+  #vmAdvancedFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:9px 0 4px}
+  #vmAdvancedFields label{min-width:0;font-size:12px}
+  #vmAdvancedFields label:nth-child(3){grid-column:1/-1}
+  #discover .filter-bottom{margin-top:8px;gap:8px}
+  #discover #resultCount{font-size:11px}
+  #discover .filter-bottom button{min-height:40px;font-size:12px}
+  #listingGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:15px 0}
+  #listingGrid .listing{border-radius:14px}
+  #listingGrid .illustration{height:112px;font-size:49px}
+  #listingGrid .image-tag{font-size:9px;padding:4px 6px;top:7px;left:7px}
+  #listingGrid .listing-copy{padding:11px;gap:7px}
+  #listingGrid .listing .category-label{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #listingGrid .listing h3{font-size:14px;line-height:1.35;min-height:38px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  #listingGrid .listing .price{font-size:19px;line-height:1.15}
+  #listingGrid .chips .chip{font-size:10px;padding:4px 6px}
+  #listingGrid .listing .meta{font-size:10px}
+  #listingGrid .listing .view{min-height:44px;font-size:12px;margin-top:auto;padding:9px 7px}
+  body:has(#discover) .finish{display:none}
+  #detailView{padding:14px 0}
+  #detailView .back-link{margin-bottom:11px}
+  #detailView .detail-heading{flex-direction:column;gap:7px}
+  #detailView h1{font-size:27px}
+  #detailView .detail-heading .big-price{font-size:25px}
+  #detailView .detail-summary{grid-template-columns:1fr;gap:11px}
+  #detailView .detail-visual{height:172px;font-size:78px}
+  #detailView .panel{padding:16px}
+  #detailView .specs{gap:8px}
+  #detailView .spec{padding:10px}
+  #detailView .journey{grid-template-columns:1fr;gap:9px}
+  #detailView .journey-card{padding:15px;gap:7px}
+  #detailView .journey-card p{font-size:12px}
+  #detailView .decision{grid-template-columns:1fr;gap:9px}
+  #draftView .draft-form{padding:16px}
+  #draftView .form-grid,#draftView .dynamic-fields{grid-template-columns:1fr;gap:13px}
+  #draftView .form-grid .full{grid-column:1}
+  #draftView .form-actions{flex-direction:column}
+  #draftView .form-actions>*{width:100%;min-height:51px}
+  /* Deal: role switching and next steps are reachable without tiny taps. */
+  body:has(#dealContent) .deal-hero{padding:21px 0 8px}
+  body:has(#dealContent) .deal-hero h1{font-size:31px;line-height:1.14}
+  body:has(#dealContent) .deal-hero p{font-size:12px}
+  body:has(#dealContent) .deal-warning{font-size:11px;padding:12px}
+  body:has(#dealContent) .deal-item{padding:14px;gap:10px;flex-wrap:wrap}
+  body:has(#dealContent) .item-symbol{width:57px;height:57px;font-size:36px}
+  body:has(#dealContent) .item-heading h2{font-size:17px}
+  body:has(#dealContent) .item-price{margin-left:0;width:100%;font-size:23px}
+  body:has(#dealContent) .deal-grid{grid-template-columns:1fr}
+  body:has(#dealContent) .deal-grid>.panel{padding:16px}
+  body:has(#dealContent) .deal-progress{gap:4px}
+  body:has(#dealContent) .deal-progress-step{padding:9px 2px;font-size:10px;min-width:0;overflow-wrap:anywhere}
+  body:has(#dealContent) .deal-progress-step small{font-size:9px}
+  body:has(#dealContent) .role-picker{flex-direction:column;align-items:stretch;gap:10px}
+  body:has(#dealContent) .role-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  body:has(#dealContent) .role-btn{min-height:48px}
+  body:has(#dealContent) .action-content .button-row{flex-direction:column}
+  body:has(#dealContent) .action-content .button-row button{width:100%;min-height:49px}
+  body:has(#dealContent) .safety{display:block}
+  body:has(#dealContent) .history-head{flex-direction:column;align-items:start}
+  body:has(#dealContent) .faq-grid{grid-template-columns:1fr}
+  /* One tap mobile affordances on supporting pages. */
+  .ai-actions .secondary,.config .primary,.footer-actions button,.footer-actions a{min-height:48px}
+  footer{padding-bottom:19px}
+}
+@media(max-width:355px){
+  #vmMobileNav a{font-size:9px}
+  #vmStickyAction{padding:8px 10px}
+  #listingGrid{gap:8px}
+  #listingGrid .listing-copy{padding:9px}
+  #listingGrid .listing .price{font-size:17px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}

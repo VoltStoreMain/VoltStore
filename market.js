@@ -141,6 +141,11 @@
       return '<div class="claim"><small>'+esc(x.title)+(x.critical?' · важно':'')+'</small><b class="'+esc(x.status)+'">'+esc(status)+'</b></div>';
     }).join('');
     const guide=core.link(item,'guide'),check=core.link(item,'check'),demoPassport=core.link(item,'passport');
+    const sellerEditor=isDraft?'<section class="panel" id="draftClaimsEditor"><span class="eyebrow">МОЙ ЛОКАЛЬНЫЙ ПАСПОРТ</span><h2>Отметки владельца черновика</h2>'+
+      '<p>Это ваш учебный черновик, не опубликованное удостоверение состояния. Выберите по каждому пункту честный статус. Данные останутся только в браузере.</p>'+
+      '<div class="claims">'+passport.getChecks(item.category).map(x=>'<label class="claim"><small>'+esc(x.title)+(x.critical?' · важно':'')+'</small><select data-draft-claim="'+esc(x.id)+'">'+
+        [['unknown','Не знаю / не проверял'],['ok','Со слов владельца: исправно'],['issue','Известен дефект']].map(pair=>'<option value="'+pair[0]+'"'+((item.claims[x.id]||'unknown')===pair[0]?' selected':'')+'>'+pair[1]+'</option>').join('')+
+      '</select></label>').join('')+'</div><button type="button" class="primary" id="saveDraftClaims">Сохранить отметки только здесь</button></section>':'';
     $('detailContent').innerHTML=
       '<div class="detail-heading"><div><span class="eyebrow">'+esc(c.name)+' / '+(isDraft?'МОЙ ЧЕРНОВИК':'ДЕМОНСТРАЦИОННЫЙ ПРИМЕР')+'</span><h1 id="detailTitle">'+esc(item.title)+'</h1><p class="fine">📍 '+esc(item.city)+' · '+esc(item.condition)+'</p></div><div class="big-price">'+price(item.price)+'</div></div>'+
       '<div class="detail-summary"><section class="panel"><div class="detail-visual" aria-hidden="true">'+c.icon+'</div><h2>Характеристики и описание</h2><p>'+esc(item.note||'Описание пока не заполнено. Не считай отсутствие описания признаком исправности.')+'</p>'+
@@ -150,10 +155,10 @@
       '<p>Начни с описания. Если что-то неясно, уточни у продавца или проведи самостоятельную проверку.</p>'+
       '<a class="outline" href="'+esc(guide)+'">✦ Спросить VoltGuide</a></aside></div>'+
       '<section class="panel"><span class="eyebrow">02 / СВЕДЕНИЯ О СОСТОЯНИИ</span><h2>Что известно со слов продавца?</h2>'+
-      '<p>Незаполненные пункты — не подтверждение исправности. Здесь показаны только демонстрационные заявления, а не результат реальной экспертизы.</p>'+
+      '<p>Незаполненные пункты — не подтверждение исправности. Это сведения со слов условного продавца или владельца локального черновика, а не независимая экспертиза.</p>'+
       '<div class="claims">'+statement+'</div>'+
       '<a class="outline" href="'+esc(demoPassport)+'">📋 Открыть пример VoltPassport ↗</a>'+
-      '<p class="fine">Пример VoltPassport — отдельная тестовая карточка. Настоящий подписанный паспорт продавца для этой позиции ещё не создан.</p></section>'+
+      '<p class="fine">VoltPassport показывает ваши тестовые данные по выбранной позиции. Это не подтверждённый сертификат состояния товара.</p></section>'+sellerEditor+
       '<section class="journey" aria-label="Инструменты проверки">'+
       '<div class="journey-card"><span class="number">03 / РАЗОБРАТЬСЯ</span><h3>✦ VoltGuide</h3><p>Поможет составить вопросы продавцу на основе категории, модели и твоих отметок.</p><a href="'+esc(guide)+'">Получить рекомендации ↗</a></div>'+
       '<div class="journey-card"><span class="number">04 / ПРОВЕРИТЬ ЛИЧНО</span><h3>🛡 VoltCheck</h3><p>Отметь работающие функции, скрытые дефекты и непроверенные пункты по чек-листу.</p><a href="'+esc(check)+'">Начать осмотр ↗</a></div>'+
@@ -166,7 +171,24 @@
     try{const saved=sessionStorage.getItem(itemKey);if(['questions','inspect','decline'].includes(saved))$('decisionSelect').value=saved;}catch(_){}
     $('decisionSelect').addEventListener('change',()=>{try{sessionStorage.setItem(itemKey,$('decisionSelect').value);}catch(_){}});
     $('downloadPlan').addEventListener('click',()=>downloadPlan(item));
-    if(isDraft)$('deleteDraft').addEventListener('click',()=>removeDraft(item.id));
+    if(isDraft){
+      $('deleteDraft').addEventListener('click',()=>removeDraft(item.id));
+      $('saveDraftClaims').addEventListener('click',()=>saveDraftClaims(item.id));
+    }
+  }
+  function saveDraftClaims(id){
+    const index=drafts.findIndex(x=>x.id===id);
+    if(index<0)return notify('Черновик не найден в этом браузере.');
+    const claims=Object.create(null);
+    $('draftClaimsEditor').querySelectorAll('select[data-draft-claim]').forEach(el=>{
+      const status=el.value;if(['ok','issue','unknown'].includes(status))claims[el.dataset.draftClaim]=status;
+    });
+    const updated=core.normalize({...drafts[index],claims});
+    if(!updated)return notify('Не удалось сохранить паспорт. Проверьте заполненные данные.');
+    const old=drafts[index];drafts[index]=updated;
+    if(!saveDisk()){drafts[index]=old;return;}
+    selectedItem=updated;renderDetail(updated);
+    notify('Отметки продавца сохранены в локальном черновике.');
   }
   function downloadPlan(item){
     const choice=$('decisionSelect').value;

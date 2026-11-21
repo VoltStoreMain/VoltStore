@@ -112,3 +112,11 @@ test('Photos are lazily hydrated and object URLs are explicitly released',()=>{
  assert.ok(js.includes('hydrateCovers(items)'));
  assert.ok(js.includes('hydrateGallery(item)'));
 });
+
+test('VoltGuide offline free advice loads without third-party Supabase SDK',()=>{
+ const html=read('voltguide.html'),js=read('voltguide.js');
+ assert.ok(!html.includes('src="https://cdn.jsdelivr.net/npm/@supabase/'));
+ assert.ok(js.includes('ensureAuthLibrary'));
+ assert.ok(js.includes("await ensureAuthLibrary()"));
+ assert.ok(js.includes("document.head.appendChild(script)"));
+});

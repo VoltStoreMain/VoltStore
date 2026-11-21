@@ -154,6 +154,7 @@
     filter.attributeValue=input.value;
   }
   function renderCatalog(){
+    clearPhotos();
     tabs();addCities();attributePicker();
     $('search').value=filter.q;$('condition').value=filter.condition;
     $('maxPrice').value=filter.maxPrice;$('sort').value=filter.sort;
@@ -164,12 +165,13 @@
       const cat=core.category(item.category);
       const chips=cat.fields.map(f=>item.attrs[f.id]!==undefined?'<span class="chip">'+esc(String(item.attrs[f.id]))+'</span>':'').filter(Boolean).slice(0,2).join('');
       return '<article class="listing">'+
-        '<div class="illustration '+esc(item.category)+'"><span class="image-tag">'+(item.kind==='draft'?'МОЙ ЧЕРНОВИК':'ДЕМО-ПРИМЕР')+'</span><span aria-hidden="true">'+cat.icon+'</span></div>'+
+        '<div class="illustration '+esc(item.category)+'"'+(item.kind==='draft'?' data-photo-id="'+esc(item.id)+'"':'')+'><span class="image-tag">'+(item.kind==='draft'?'МОЙ ЧЕРНОВИК':'ДЕМО-ПРИМЕР')+'</span><span aria-hidden="true">'+cat.icon+'</span></div>'+
         '<div class="listing-copy"><span class="category-label">'+esc(cat.name)+' · '+esc(item.city)+'</span><h3>'+esc(item.title)+'</h3>'+
         '<div class="chips"><span class="chip">'+esc(item.condition)+'</span>'+chips+'</div><div class="price">'+price(item.price)+'</div>'+
         '<div class="meta">'+(item.kind==='draft'?'Никому не опубликовано':'Цена и товар — демонстрационные')+'</div>'+
         '<button class="view" type="button" data-open="'+esc(item.id)+'">Изучить товар →</button></div></article>';
     }).join(''):'<div class="empty">По заданным фильтрам нет товаров.<br><button class="outline" type="button" data-reset="1">Сбросить фильтры</button></div>';
+    hydrateCovers(items);
   }
   function chooseCategory(cat){
     if(cat!=='all'&&!core.CATEGORY_IDS.includes(cat))return;
@@ -214,6 +216,7 @@
     return passport.getChecks(item.category).map(x=>({title:x.title,status:item.claims[x.id]||'unknown',critical:!!x.critical}));
   }
   function renderDetail(item){
+    clearPhotos();
     const c=core.category(item.category),isDraft=item.kind==='draft';
     const attrs=c.fields.filter(x=>item.attrs[x.id]!==undefined);
     const claims=getClaims(item);
@@ -230,7 +233,7 @@
       '</select></label>').join('')+'</div><button type="button" class="primary" id="saveDraftClaims">Сохранить отметки только здесь</button></section>':'';
     $('detailContent').innerHTML=
       '<div class="detail-heading"><div><span class="eyebrow">'+esc(c.name)+' / '+(isDraft?'МОЙ ЧЕРНОВИК':'ДЕМОНСТРАЦИОННЫЙ ПРИМЕР')+'</span><h1 id="detailTitle">'+esc(item.title)+'</h1><p class="fine">📍 '+esc(item.city)+' · '+esc(item.condition)+'</p></div><div class="big-price">'+price(item.price)+'</div></div>'+
-      '<div class="detail-summary"><section class="panel"><div class="detail-visual" aria-hidden="true">'+c.icon+'</div><h2>Характеристики и описание</h2><p>'+esc(item.note||'Описание пока не заполнено. Не считай отсутствие описания признаком исправности.')+'</p>'+
+      '<div class="detail-summary"><section class="panel"><div class="detail-visual" id="detailGallery"><span aria-hidden="true">'+c.icon+'</span></div><div id="galleryThumbs" class="gallery-thumbs" aria-label="Фотографии товара"></div><h2>Характеристики и описание</h2><p>'+esc(item.note||'Описание пока не заполнено. Не считай отсутствие описания признаком исправности.')+'</p>'+
       '<div class="specs">'+attrs.map(f=>'<div class="spec"><small>'+esc(f.label)+'</small><b>'+esc(String(item.attrs[f.id]))+'</b></div>').join('')+
       '<div class="spec"><small>Заявленное состояние</small><b>'+esc(item.condition)+'</b></div><div class="spec"><small>Город</small><b>'+esc(item.city)+'</b></div></div></section>'+
       '<aside class="panel"><h2>Сначала факты, потом решение</h2><div class="trust-status"><span>!</span><span><strong>Не сертифицировано VoltStore.</strong><br>Это '+(isDraft?'локальный черновик':'вымышленный пример')+'. Заявления о состоянии не проверены независимым специалистом. Никакие деньги не принимаются.</span></div>'+
@@ -253,6 +256,7 @@
       '<select id="decisionSelect" aria-label="Моё решение"><option value="questions">Остались вопросы продавцу</option><option value="inspect">Хочу проверить товар при встрече</option><option value="decline">Решил отказаться от предложения</option></select></div>'+
       '<button class="primary" type="button" id="downloadPlan">Скачать план .txt</button></section>'+
       (isDraft?'<button class="subtle" type="button" id="deleteDraft">Удалить этот локальный черновик</button>':'');
+    hydrateGallery(item);
     const itemKey='voltmarket-decision:'+item.id;
     try{const saved=sessionStorage.getItem(itemKey);if(['questions','inspect','decline'].includes(saved))$('decisionSelect').value=saved;}catch(_){}
     $('decisionSelect').addEventListener('change',()=>{try{sessionStorage.setItem(itemKey,$('decisionSelect').value);}catch(_){}});
@@ -290,8 +294,10 @@
   }
   function removeDraft(id){
     if(!confirm('Удалить черновик только из этого браузера?'))return;
+    const previous=drafts;
     drafts=drafts.filter(x=>x.id!==id);
-    if(!saveDisk())return;
+    if(!saveDisk()){drafts=previous;return;}
+    if(photos)photos.remove(id).catch(()=>notify('Черновик удалён, но фотографии остались в хранилище устройства.'));
     notify('Локальный черновик удалён.');goto('#discover');
   }
   function init(){
@@ -305,15 +311,16 @@
     $('backFromDraft').addEventListener('click',()=>goto('#discover'));
     $('resetFilters').addEventListener('click',resetFilters);
     $('detailContent').addEventListener('click',e=>{const jump=e.target.closest('[data-decision]');if(jump){e.preventDefault();$('decisionPanel')?.scrollIntoView({behavior:'smooth'});}});
-    $('search').addEventListener('input',e=>{filter.q=e.target.value;renderCatalog();});
+    $('search').addEventListener('input',e=>{filter.q=e.target.value;clearTimeout(searchTimer);searchTimer=setTimeout(renderCatalog,120);});
     $('city').addEventListener('change',e=>{filter.city=e.target.value;renderCatalog();});
     $('condition').addEventListener('change',e=>{filter.condition=e.target.value;renderCatalog();});
     $('maxPrice').addEventListener('change',e=>{filter.maxPrice=e.target.value;renderCatalog();});
     $('sort').addEventListener('change',e=>{filter.sort=e.target.value;renderCatalog();});
     $('attributeFilter').addEventListener('change',e=>{filter.attributeValue=e.target.value;renderCatalog();});
     $('formCategory').addEventListener('change',dynamicFields);
+    $('formPhotos').addEventListener('change',previewSelected);
     $('draftForm').addEventListener('submit',saveDraft);
-    $('draftForm').addEventListener('reset',()=>{setTimeout(dynamicFields,0);$('formMessage').textContent='';});
+    $('draftForm').addEventListener('reset',()=>{clearPreview();setTimeout(dynamicFields,0);$('formMessage').textContent='';});
     window.addEventListener('hashchange',renderRoute);
     renderRoute();
   }

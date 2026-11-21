@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090f1c">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="VoltPassport — паспорт состояния подержанного смартфона со слов продавца и возможностью проверки покупателем.">
+  <title>VoltPassport — паспорт состояния товара</title>
+  <link rel="stylesheet" href="voltpassport.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script defer src="config.js"></script>
+  <script defer src="passport-core.js"></script>
+  <script defer src="passport-app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap bar-inner"><a class="logo" href="./#resale" aria-label="VoltStore — объявления"><span class="mark">V</span><span>VOLT<span class="accent">STORE</span></span></a><span class="pill">VOLTPASSPORT / BETA</span><a class="small-link" href="./#resale">← К объявлениям</a></div>
+  </header>
+  <main class="wrap page">
+    <div class="hero">
+      <div class="eyebrow"><span class="eyedot"></span> ПРОЗРАЧНОСТЬ ПЕРЕД ПОКУПКОЙ</div>
+      <h1>Что известно <span>о состоянии товара?</span></h1>
+      <p class="intro">Паспорт показывает сведения <strong>со слов продавца</strong>. Покупатель может сверить их со своей проверкой — без слепого доверия зелёным галочкам.</p>
+    </div>
+    <div id="notice" class="notice" role="status" aria-live="polite">Загружаем данные…</div>
+    <div id="mainContent" hidden>
+      <div class="product card">
+        <div><div class="kicker">ПАСПОРТ ОБЪЯВЛЕНИЯ <span id="demoTag" class="demo-tag" hidden>ДЕМО</span></div><h2 id="productTitle">Смартфон</h2><div class="meta"><span id="productCity">Город не указан</span><span class="separator">·</span><span id="productDate">Паспорт ещё не создан</span></div></div>
+        <div class="price" id="productPrice"></div>
+      </div>
+      <div class="trustline"><span class="trust-icon">!</span><span><strong>Это не сертификат и не гарантия VoltStore.</strong> Отметки добавляет продавец. Полный IMEI, документы и персональные данные здесь не публикуются. Проверяй устройство лично до оплаты.</span></div>
+      <section class="overview" aria-label="Сводка"><div class="stat card"><div class="stat-number" id="statFilled">0/11</div><div class="stat-label">Пунктов заполнено продавцом</div></div><div class="stat card"><div class="stat-number" id="statIssues">0</div><div class="stat-label">Заявлено замечаний</div></div><div class="stat card"><div class="stat-number" id="statCompare">—</div><div class="stat-label">Расхождений с моей проверкой</div></div></section>
+      <div class="section-head"><div><span class="kicker">01 / СОСТОЯНИЕ</span><h2>Проверка по пунктам</h2><p class="muted">У продавца и покупателя — отдельные отметки. Отсутствие отметки не означает исправности.</p></div><button class="ghost" id="btnVoltcheck" type="button">🛡️ Открыть VoltCheck ↗</button></div>
+      <div id="checksList" class="checks" role="group" aria-label="Проверки состояния"></div>
+      <div id="sellerActions" class="seller-actions card" hidden><div><strong>Сохрани сведения о состоянии</strong><p>После сохранения они станут доступны посетителям активного объявления. История изменений в v1 не хранится.</p></div><button id="savePassport" type="button" class="primary">Сохранить паспорт</button></div>
+      <div class="result card" id="comparisonResult" aria-live="polite"><span class="kicker">02 / РЕЗУЛЬТАТ</span><h3 id="resultTitle">Начните со своей проверки</h3><p id="resultText" class="muted"></p><div id="resultNotes" class="result-notes"></div></div>
+      <div class="footer-actions"><button id="copyLink" class="ghost" type="button">Копировать ссылку</button><button id="printPassport" class="ghost" type="button">Распечатать</button><a class="ghost" href="./#resale">Вернуться к объявлениям</a></div>
+      <p class="legal">VoltPassport v1 · Сведения о товаре со слов продавца. Результаты покупателя сохраняются только в этой вкладке браузера и не отправляются продавцу или на сервер. При сомнениях проверьте документы, состояние и статус IMEI через официальный источник.</p>
+    </div>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

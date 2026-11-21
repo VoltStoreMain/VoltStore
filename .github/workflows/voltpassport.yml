@@ -4,11 +4,14 @@ on:
     branches:
       - feature/voltpassport-v1
       - feature/voltstore-universal-inspections
+      - feature/voltguide-ai-assistant
   pull_request:
     paths:
       - 'passport-*.js'
       - 'voltpassport.*'
       - 'voltcheck-all.*'
+      - 'voltguide*'
+      - 'netlify/functions/voltguide-ai.mjs'
       - 'tests/*.test.cjs'
       - '.github/workflows/voltpassport.yml'
 jobs:
@@ -26,5 +29,8 @@ jobs:
           node --check passport-core.js
           node --check passport-app.js
           node --check voltcheck-all.js
+          node --check voltguide-core.js
+          node --check voltguide.js
+          node --check netlify/functions/voltguide-ai.mjs
       - name: Check domain logic and integration structure
-        run: node --test tests/*.test.cjs
+        run: node --test tests/*.test.cjs tests/*.test.mjs

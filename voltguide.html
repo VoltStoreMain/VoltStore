@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090f1c">
+  <meta name="description" content="VoltGuide — помощник по проверке и покупке подержанных смартфонов, ноутбуков, мебели и велосипедов.">
+  <meta name="robots" content="noindex, nofollow">
+  <title>VoltGuide — помощник перед покупкой | VoltStore</title>
+  <link rel="stylesheet" href="voltguide.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script defer src="config.js"></script>
+  <script defer src="passport-core.js"></script>
+  <script defer src="voltguide-core.js"></script>
+  <script defer src="voltguide.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <a class="brand" href="./#resale" aria-label="VoltStore — главная"><span class="logo">V</span> VOLT<span class="accent">STORE</span></a>
+      <div class="right"><span class="pill">VOLTGUIDE / BETA</span><a href="./#resale" class="link">← Объявления</a></div>
+    </div>
+  </header>
+  <main class="container">
+    <section class="hero">
+      <div class="eyebrow"><span class="dot"></span> НАЙДИ НЕ ПРОСТО ТОВАР — ПОЙМИ, ЧТО ПОКУПАЕШЬ</div>
+      <h1>Твой помощник <span>перед покупкой.</span></h1>
+      <p class="subtitle">Разберём риски конкретной категории, соберём вопросы продавцу и направим на проверку. Экспертные подсказки доступны бесплатно и без регистрации.</p>
+    </section>
+    <div class="layout">
+      <section class="panel config" aria-label="Настройка помощника">
+        <div class="section-head"><span class="step">01</span><h2>Расскажи о товаре</h2></div>
+        <label for="category">Категория</label><select id="category"></select>
+        <label for="mode">Твоя цель</label><select id="mode">
+          <option value="buy">Хочу купить</option><option value="inspect">Проверяю перед встречей</option><option value="sell">Хочу продать</option>
+        </select>
+        <label for="model">Товар / модель</label><input id="model" maxlength="90" autocomplete="off" placeholder="Например, iPhone 15 Pro">
+        <label for="price">Цена, ₸ (необязательно)</label><input id="price" type="number" inputmode="numeric" min="0" max="100000000" placeholder="Например, 250000">
+        <div class="context-notice" id="contextNotice" aria-live="polite">Пока нет данных об осмотре. Помощник предложит первые проверки.</div>
+        <button class="primary" id="analyze" type="button">Получить рекомендации <span aria-hidden="true">→</span></button>
+        <div class="mini-actions"><a class="outline" id="goCheck" href="voltcheck-all.html">🛡️ Открыть VoltCheck</a><a class="outline" id="goPassport" href="voltpassport.html?demo=1">📋 VoltPassport</a></div>
+        <p class="tiny">VoltGuide не имеет доступа к скрытым дефектам, рыночным ценам и личным данным продавцов. Не вводите номера IMEI, документы или контакты.</p>
+      </section>
+      <section class="panel results" aria-live="polite">
+        <div class="section-head"><span class="step">02</span><h2>Рекомендации</h2><span class="method">Правила проверки · бесплатно</span></div>
+        <div class="result-top"><span class="status" id="headline">С чего начать</span><h3 id="summary">Выбери категорию и цель — покажу план действий.</h3><span class="subtext" id="meta"></span></div>
+        <section class="result-section"><h4>На что обратить внимание</h4><ul id="warnings"></ul></section>
+        <section class="result-section"><h4>Вопросы продавцу</h4><ol id="questions"></ol><button type="button" class="small-button" id="copyQuestions">Копировать вопросы</button></section>
+        <section class="result-section"><h4>Что делать дальше</h4><ol id="steps"></ol></section>
+        <div class="fine" id="disclaimer">Подсказки не заменяют личную проверку, экспертную диагностику или юридическую консультацию.</div>
+      </section>
+    </div>
+    <section class="panel ai-panel" aria-labelledby="aiTitle">
+      <div class="ai-heading"><div><span class="eyebrow">ДОПОЛНИТЕЛЬНЫЙ РЕЖИМ</span><h2 id="aiTitle">Спросить AI о конкретной ситуации</h2><p>Генеративный режим запускается только вручную и только при разрешённом серверном подключении. Пока он не настроен, бесплатные рекомендации выше работают без AI API.</p></div><span class="ai-badge">Экспериментально</span></div>
+      <label for="question">Вопрос (без персональных данных)</label>
+      <textarea id="question" maxlength="450" rows="3" placeholder="Например: продавец говорит, что менял экран. Что проверить перед оплатой?"></textarea>
+      <label class="consent"><input id="consent" type="checkbox"><span>Я понимаю, что мой вопрос и выбранные параметры товара могут передаваться AI-провайдеру, если я нажму кнопку. Не отправляю контакты, IMEI или документы.</span></label>
+      <div class="ai-actions"><button type="button" class="secondary" id="askAI">Спросить AI</button><span class="tiny">Без подключения модели API-запросы не выполняются.</span></div>
+      <div id="aiResult" class="ai-response" role="status" aria-live="polite" hidden></div>
+    </section>
+    <footer>VoltGuide Beta · Отметки осмотра хранятся в этой вкладке браузера. Безопасность сделки не гарантируется. <a href="./#resale">Вернуться в VoltStore</a></footer>
+  </main>
+</body>
+</html>

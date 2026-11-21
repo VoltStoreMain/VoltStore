@@ -35,6 +35,10 @@
     const c=core.getCategory(category);$('categoryTitle').textContent=c.icon+' '+c.label;
     $('categorySubtitle').textContent=c.subtitle;
     $('openPassport').href='voltpassport.html?'+new URLSearchParams({demo:'1',category}).toString();
+    const guideParams=new URLSearchParams({category});if(adId)guideParams.set('ad',adId);
+    if(inputModel.value.trim())guideParams.set('model',inputModel.value.trim().slice(0,90));
+    if(inputPrice.value)guideParams.set('price',inputPrice.value);
+    $('openGuide').href='voltguide.html?'+guideParams.toString();
     summarize();
   }
   function summarize(){
@@ -89,7 +93,7 @@
     const id=ta.dataset.note;if(!core.getChecks(category).some(x=>x.id===id))return;
     state[id].note=core.clean(ta.value,180);persist();
   });
-  inputModel.addEventListener('input',persist);inputPrice.addEventListener('input',persist);
+  inputModel.addEventListener('input',()=>{persist();render();});inputPrice.addEventListener('input',()=>{persist();render();});
   $('download').addEventListener('click',exportReport);
   $('print').addEventListener('click',()=>window.print());
   $('reset').addEventListener('click',()=>{

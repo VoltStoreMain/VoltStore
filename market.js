@@ -29,7 +29,7 @@
   }
   function all(){return core.samples().concat(drafts);}
   function route(){
-    const hash=decodeURIComponent(location.hash.slice(1));
+    let hash='';try{hash=decodeURIComponent(location.hash.slice(1));}catch(_){return 'list';}
     if(hash==='draft')return 'draft';
     if(hash.startsWith('item/'))return 'item';
     return 'list';
@@ -37,7 +37,7 @@
   function goto(hash){location.hash=hash;renderRoute();window.scrollTo({top:0,behavior:'instant'});}
   function renderRoute(){
     const target=route();
-    const id=target==='item'?decodeURIComponent(location.hash.slice('#item/'.length)):null;
+    let id=null;if(target==='item'){try{id=decodeURIComponent(location.hash.slice('#item/'.length));}catch(_){id=null;}}
     selectedItem=id?all().find(x=>x.id===id):null;
     const view=target==='item'&&selectedItem?'detail':target==='draft'?'draft':'list';
     document.body.dataset.view=view;
@@ -188,7 +188,6 @@
   }
   function init(){
     drafts=fromDisk();
-    for(const city of ['Алматы','Астана','Шымкент','Караганда'])if(!core.CONDITIONS.includes(city)){} // city list is derived from examples
     $('condition').innerHTML='<option value="">Любое состояние</option>'+core.CONDITIONS.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
     $('categoryTabs').addEventListener('click',e=>{const b=e.target.closest('[data-category]');if(b)chooseCategory(b.dataset.category);});
     $('listingGrid').addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(b)goto('#item/'+encodeURIComponent(b.dataset.open));if(e.target.closest('[data-reset]'))resetFilters();});
@@ -197,6 +196,7 @@
     $('backToResults').addEventListener('click',()=>goto('#discover'));
     $('backFromDraft').addEventListener('click',()=>goto('#discover'));
     $('resetFilters').addEventListener('click',resetFilters);
+    $('detailContent').addEventListener('click',e=>{const jump=e.target.closest('[data-decision]');if(jump){e.preventDefault();$('decisionPanel')?.scrollIntoView({behavior:'smooth'});}});
     $('search').addEventListener('input',e=>{filter.q=e.target.value;renderCatalog();});
     $('city').addEventListener('change',e=>{filter.city=e.target.value;renderCatalog();});
     $('condition').addEventListener('change',e=>{filter.condition=e.target.value;renderCatalog();});

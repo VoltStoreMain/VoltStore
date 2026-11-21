@@ -95,6 +95,7 @@
     if(target==='guide')return 'voltguide.html?'+params;
     if(target==='check')return 'voltcheck-all.html?'+params;
     if(target==='passport'){params.set('demo','1');return 'voltpassport.html?'+params;}
+    if(target==='deal')return 'voltdeal.html?ad='+encodeURIComponent(item.id);
     return 'market.html#item/'+encodeURIComponent(item.id);
   }
   const exported=Object.freeze({CATEGORIES:categories,CATEGORY_IDS:IDS,CONDITIONS,DEMO,clean,category,attributes,normalize,samples,matches,filter,link});

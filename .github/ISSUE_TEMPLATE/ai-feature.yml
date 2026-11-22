@@ -1,0 +1,45 @@
+name: "VoltStore · новая функция"
+description: "Задача для vibe-working: от идеи до draft PR и проверки."
+title: "[Feature] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Проблема пользователя"
+      description: "Кто и что не может сделать сейчас?"
+      placeholder: "Покупателю трудно понять, как забронировать проверенный товар на телефоне."
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: "Желаемый результат"
+      description: "Что должно реально работать после изменения?"
+      placeholder: "Пользователь видит следующий шаг и честный статус заявки."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: "Критерии готовности"
+      description: "3–5 проверяемых условий на Android и iPhone."
+      placeholder: "- Работает на 320–430 px\n- Нет ложных сообщений об оплате\n- Пройдены Playwright и Lighthouse"
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: "Какая среда затрагивается?"
+      options:
+        - "Только локальная демоверсия / preview"
+        - "Backend/Supabase — нужен отдельный допуск"
+        - "Рабочий сайт / платёж — требуется отдельное согласие"
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "Ссылки, скриншоты, ограничения"
+      description: "Без секретов, телефонов, документов и иных персональных данных."
+    validations:
+      required: false

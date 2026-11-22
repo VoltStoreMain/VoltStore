@@ -1,0 +1,33 @@
+name: "VoltStore · ошибка"
+description: "Найти, воспроизвести и исправить дефект."
+title: "[Bug] "
+body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: "Что сломалось?"
+      description: "Фактическое поведение и ожидаемый результат."
+      placeholder: "Кнопка оформления не открывает экран сделки."
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: "Как воспроизвести"
+      placeholder: "1. Открыть preview на телефоне\n2. Выбрать товар\n3. Нажать «Оформить»"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: "Устройство / браузер / ссылка"
+      placeholder: "iPhone Safari, Android Chrome, desktop; preview URL"
+    validations:
+      required: false
+  - type: textarea
+    id: evidence
+    attributes:
+      label: "Скриншот, сообщение об ошибке, результаты теста"
+      description: "Удалите из логов секреты и персональные данные."
+    validations:
+      required: false

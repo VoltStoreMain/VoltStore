@@ -112,7 +112,7 @@
    if(row.blob instanceof Blob)return row.blob;
    const data=row.data;
    if(data instanceof ArrayBuffer || ArrayBuffer.isView(data))
-     return new Blob([data],{type:row.mime==='image/jpeg'?'image/jpeg':'image/jpeg'});
+     return new Blob([data],{type:'image/jpeg'});
    return null;
  }
  async function list(id){

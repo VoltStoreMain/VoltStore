@@ -62,12 +62,7 @@
   secondary.addEventListener('click',()=>{if(secondaryHref)location.href=secondaryHref;});
   if(isMarket){
     const discover=$('discover');
-    if(discover){
-      const notice=document.createElement('div');
-      notice.id='vmMobileIntro';
-      notice.textContent='VoltMarket Beta · тестовые объявления и цены, без реальной оплаты или брони';
-      discover.insertBefore(notice,discover.firstChild);
-    }
+    // Notice is rendered in HTML before paint; never inject it after the page becomes visible.
     const filters=$('discover')?.querySelector('.filters');
     if(filters&&filters.children.length>=2&&!$('vmAdvancedFilters')){
       const advanced=document.createElement('details');

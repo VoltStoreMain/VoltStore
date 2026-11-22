@@ -11,6 +11,10 @@ on:
       - feature/pwa-performance-photos
   pull_request:
     paths:
+      - 'scripts/**'
+      - 'tests/*.test.mjs'
+      - 'package.json'
+      - '.gitignore'
       - 'passport-*.js'
       - 'voltpassport.*'
       - 'voltcheck-all.*'
@@ -56,19 +60,7 @@ jobs:
           node --check photo-store.js
           node --check sw.js
           node --check netlify/functions/voltguide-ai.mjs
+          node --check scripts/build-preview.mjs
       - name: Check domain logic and integration structure
         run: node --test tests/*.test.cjs tests/*.test.mjs
-      - name: Assemble static PWA preview
-        run: |
-          mkdir -p preview/icons
-          cp icons/*.png preview/icons/
-          for f in index.html styles.css universal-landing.css app.js live.js config.js market.html market.css market-core.js market.js mobile-shell.css mobile-shell.js photo-store.js pwa-client.js manifest.webmanifest sw.js offline.html voltdeal.html voltdeal.css voltdeal-core.js voltdeal.js voltguide.html voltguide.css voltguide-core.js voltguide.js passport-core.js passport-app.js voltpassport.html voltpassport.css voltcheck-all.html voltcheck-all.css voltcheck-all.js voltcheck.html; do
-            cp "$f" preview/
-          done
-      - name: Export tested preview artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: voltstore-pwa-preview
-          path: preview/
-          if-no-files-found: error
-          retention-days: 7
+      # The browser workflow builds, tests and exports the single isolated artifact.

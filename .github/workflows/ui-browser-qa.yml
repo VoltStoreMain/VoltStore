@@ -43,6 +43,8 @@ jobs:
           node-version: '22'
       - name: Install pinned test tools
         run: npm install --no-audit --no-fund --package-lock=false
+      - name: Run existing VoltStore unit and integration tests
+        run: npm run test:unit
       - name: Install headless browsers
         run: npx playwright install --with-deps chromium webkit
       - name: Run end-to-end browser tests

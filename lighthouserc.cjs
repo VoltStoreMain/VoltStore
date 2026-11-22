@@ -1,0 +1,27 @@
+module.exports={
+  ci:{
+    collect:{
+      url:[
+        'http://127.0.0.1:4178/market.html',
+        'http://127.0.0.1:4178/voltdeal.html?ad=demo-phone-1',
+        'http://127.0.0.1:4178/voltguide.html?category=laptop'
+      ],
+      numberOfRuns:2,
+      settings:{
+        formFactor:'mobile',
+        screenEmulation:{mobile:true,width:390,height:844,deviceScaleFactor:2,disabled:false},
+        throttlingMethod:'simulate',
+        chromeFlags:'--no-sandbox --disable-dev-shm-usage'
+      }
+    },
+    assert:{
+      assertions:{
+        'categories:performance':['error',{minScore:0.35}],
+        'categories:accessibility':['error',{minScore:0.65}],
+        'categories:best-practices':['warn',{minScore:0.60}],
+        'categories:seo':['warn',{minScore:0.40}]
+      }
+    },
+    upload:{target:'filesystem',outputDir:'.lighthouseci/reports'}
+  }
+};

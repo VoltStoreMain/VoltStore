@@ -94,25 +94,38 @@
    // Compress ALL images before the transaction, which stays short and atomic.
    const blobs=[];
    for(const file of chosen)blobs.push(await compress(file));
+   // Safari/WebKit can fail to store Blob/File in IndexedDB (UnknownError).
+   // Store structured-cloneable ArrayBuffers instead; no extra base64 memory cost.
+   const buffers=[];
+   for(const blob of blobs)buffers.push(await blob.arrayBuffer());
    await store('readwrite',s=>{
      const deletes=[];for(let i=0;i<LIMIT;i++)deletes.push(s.delete(id+':'+i));
-     const writes=blobs.map((blob,i)=>s.put({key:id+':'+i,listingId:id,pos:i,
-       blob,updated:Date.now()}));
+     const writes=buffers.map((data,i)=>s.put({key:id+':'+i,listingId:id,pos:i,
+       data,mime:'image/jpeg',updated:Date.now()}));
      return deletes.concat(writes);
    });
    return blobs.map(b=>({bytes:b.size,type:b.type}));
+ }
+ function rowToBlob(row){
+   if(!row)return null;
+   // Backward compatibility for existing local drafts stored before this fix.
+   if(row.blob instanceof Blob)return row.blob;
+   const data=row.data;
+   if(data instanceof ArrayBuffer || ArrayBuffer.isView(data))
+     return new Blob([data],{type:'image/jpeg'});
+   return null;
  }
  async function list(id){
    if(!validId(id))return [];
    // Use exact keys, not arbitrary user-supplied key ranges.
    const out=await store('readonly',s=>Array.from({length:LIMIT},(_,i)=>s.get(id+':'+i)));
-   return (Array.isArray(out)?out:[out]).filter(x=>x&&x.blob instanceof Blob)
-     .sort((a,b)=>a.pos-b.pos).map(x=>x.blob);
+   return (Array.isArray(out)?out:[out]).filter(Boolean)
+     .sort((a,b)=>a.pos-b.pos).map(rowToBlob).filter(Boolean);
  }
  async function first(id){
    if(!validId(id))return null;
    const row=await store('readonly',s=>s.get(id+':0'));
-   return row&&row.blob instanceof Blob?row.blob:null;
+   return rowToBlob(row);
  }
  async function remove(id){
    if(!validId(id))return;

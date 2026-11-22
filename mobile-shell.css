@@ -42,7 +42,7 @@
   #discover .section-top p{font-size:12px}
   #discover .beta-label{display:none}
   #categoryTabs{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;scroll-snap-type:x proximity;
-    margin:0 -1px 13px;padding:1px 1px 9px;overscroll-behavior-inline:contain}
+    height:63px;min-height:63px;margin:0 -1px 13px;padding:1px 1px 9px;overscroll-behavior-inline:contain}
   #categoryTabs::-webkit-scrollbar{display:none}
   #categoryTabs .category-button{flex:0 0 auto;min-width:116px;min-height:49px;max-width:166px;
     padding:10px 12px;font-size:12px;scroll-snap-align:start}
@@ -51,6 +51,19 @@
   #discover .filters{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
   #discover .filters>label:first-child{grid-column:1/-1}
   #discover .filters>label:first-child input{height:51px;border-radius:12px}
+  /* Before JavaScript rearranges filters, reserve the same collapsed height. */
+  #discover .filters>label:not(:first-child){display:none}
+  #discover .filters:not(:has(#vmAdvancedFilters))::after{
+    content:'⚙ Фильтры по городу, состоянию и цене';
+    display:flex;align-items:center;min-height:49px;padding:5px 1px 0;
+    color:#83eac3;font-size:13px;font-weight:750
+  }
+  #discover #vmAdvancedFields>label{display:flex}
+  /* Install prompt is an overlay, not a late-injected layout shift. */
+  #discover .pwa-install:not([hidden]){
+    position:fixed;z-index:1102;left:13px;right:13px;bottom:calc(72px + env(safe-area-inset-bottom));
+    margin:0;box-shadow:0 14px 38px #0008;
+  }
   #vmAdvancedFilters{grid-column:1/-1;display:block;margin-top:5px}
   #vmAdvancedFilters:not([open]) #vmAdvancedFields{display:none}
   #vmAdvancedFilters>summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;

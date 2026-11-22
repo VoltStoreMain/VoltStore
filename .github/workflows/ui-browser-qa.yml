@@ -1,0 +1,96 @@
+name: VoltStore browser E2E & Lighthouse
+on:
+  push:
+    branches:
+      - feature/ci-playwright-lighthouse
+  pull_request:
+    paths:
+      - 'e2e/**'
+      - 'playwright.config.cjs'
+      - 'lighthouserc.cjs'
+      - 'package.json'
+      - 'market*'
+      - 'voltdeal*'
+      - 'voltguide*'
+      - 'voltcheck-all*'
+      - 'voltpassport*'
+      - 'passport-*'
+      - 'mobile-shell*'
+      - 'photo-store.js'
+      - 'pwa-client.js'
+      - 'sw.js'
+      - 'manifest.webmanifest'
+      - 'icons/**'
+      - '.github/workflows/ui-browser-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: voltstore-ui-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    name: Playwright / Chromium + Android emulation + WebKit iPhone
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned test tools
+        run: npm install --no-audit --no-fund --package-lock=false
+      - name: Run existing VoltStore unit and integration tests
+        run: npm run test:unit
+      - name: Install headless browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Run end-to-end browser tests
+        run: npm run test:e2e
+        env:
+          CI: 'true'
+      - name: Save browser screenshots, traces, videos and HTML/JUnit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltstore-playwright-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 7
+
+  lighthouse:
+    name: Lighthouse CI / mobile performance & accessibility
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned Lighthouse tools
+        run: npm install --no-audit --no-fund --package-lock=false
+      - name: Start isolated static preview on localhost
+        run: |
+          python3 -m http.server 4178 --bind 127.0.0.1 > /tmp/voltstore-qa-http.log 2>&1 &
+          for i in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:4178/market.html -o /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/voltstore-qa-http.log
+          exit 1
+      - name: Measure mobile Lighthouse results and enforce conservative thresholds
+        run: npm run test:lighthouse
+      - name: Archive Lighthouse JSON/HTML reports (private GitHub artifact, not public upload)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltstore-lighthouse-${{ github.run_id }}
+          path: |
+            .lighthouseci/
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 7

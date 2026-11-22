@@ -120,3 +120,12 @@ test('VoltGuide offline free advice loads without third-party Supabase SDK',()=>
  assert.ok(js.includes("await ensureAuthLibrary()"));
  assert.ok(js.includes("document.head.appendChild(script)"));
 });
+
+test('Safari/WebKit-compatible photo persistence uses ArrayBuffer, with legacy Blob reader',()=>{
+ const js=read('photo-store.js');
+ assert.ok(js.includes('await blob.arrayBuffer()'));
+ assert.ok(js.includes('data,mime:'));
+ assert.ok(js.includes('function rowToBlob(row)'));
+ assert.ok(js.includes('row.blob instanceof Blob'));
+ assert.ok(js.includes("new Blob([data],{type:'image/jpeg'})"));
+});

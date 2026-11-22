@@ -1,0 +1,16 @@
+{
+  "name": "voltstore-ui-qa",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Isolated Playwright and Lighthouse QA for VoltStore preview; no production APIs.",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:lighthouse": "lhci autorun",
+    "test:unit": "node --test tests/*.test.cjs tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "@lhci/cli": "0.16.1",
+    "@playwright/test": "1.65.1"
+  }
+}

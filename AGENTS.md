@@ -18,6 +18,7 @@ The repo uses vanilla HTML/CSS/JavaScript for the storefront, Supabase for live 
 8. Explain what was tested and what remains untested; do not call a Lighthouse score a production measurement or emulator a physical-device test.
 
 ## Mobile-first definition of done
+- Keep the interface focused on products and the next purchase step. Prefer progressive disclosure; do not add banners, buttons, sections or tools without a clear user need. The owner explicitly prefers a simple, uncluttered site.
 - Usable at 320, 375, 390 and 430 CSS pixels; no horizontal scrolling.
 - Buttons, forms and focus are touch and keyboard accessible; safe-area respected.
 - A buyer can navigate: discovery → detail → VoltPassport/VoltGuide/VoltCheck → VoltDeal **demo** without losing selected listing ID.

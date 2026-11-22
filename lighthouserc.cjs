@@ -1,6 +1,9 @@
 module.exports={
   ci:{
     collect:{
+      startServerCommand:'node scripts/build-preview.mjs --verify && python3 -u -m http.server 4178 --bind 127.0.0.1 --directory preview',
+      startServerReadyPattern:'Serving HTTP on',
+      startServerReadyTimeout:15000,
       url:[
         'http://127.0.0.1:4178/market.html',
         'http://127.0.0.1:4178/voltdeal.html?ad=demo-phone-1',

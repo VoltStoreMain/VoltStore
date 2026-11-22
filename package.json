@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "description": "Isolated Playwright and Lighthouse QA for VoltStore preview; no production APIs.",
   "scripts": {
+    "build:preview": "node scripts/build-preview.mjs",
+    "verify:preview": "node scripts/build-preview.mjs --verify",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:lighthouse": "lhci autorun",

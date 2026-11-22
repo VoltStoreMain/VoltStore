@@ -27,10 +27,10 @@ module.exports=defineConfig({
     {name:'iphone-webkit',use:{...devices['iPhone 13']}}
   ],
   webServer:{
-    command:'python3 -m http.server 4177 --bind 127.0.0.1',
+    command:'node scripts/build-preview.mjs --verify && python3 -m http.server 4177 --bind 127.0.0.1 --directory preview',
     url:'http://127.0.0.1:4177/market.html',
     timeout:30000,
-    reuseExistingServer:!process.env.CI
+    reuseExistingServer:false
   },
   outputDir:'test-results/artifacts'
 });

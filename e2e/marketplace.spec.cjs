@@ -1,7 +1,52 @@
-const {test,expect}=require('@playwright/test');
+const {test:base,expect}=require('@playwright/test');
 const fs=require('node:fs');
 const path=require('node:path');
 const samplePng=fs.readFileSync(path.join(__dirname,'..','icons','voltstore-192.png'));
+const test=base.extend({
+  demoNetwork:[async({context,baseURL},use)=>{
+    const unexpected=[];
+    const origin=new URL(baseURL).origin;
+    await context.route('**/*',async route=>{
+      const url=new URL(route.request().url());
+      if(url.origin!==origin||/^\/(?:\.netlify|api|auth|supabase)(?:\/|$)/.test(url.pathname)){
+        unexpected.push(url.origin+url.pathname);
+        await route.abort('blockedbyclient');
+      }else await route.continue();
+    });
+    await use();
+    expect(unexpected,'Demo must not attempt backend, payment, AI or third-party requests').toEqual([]);
+  },{auto:true}]
+});
+
+test('изолированная сборка: главная ведёт в каталог, исходный магазин и серверные файлы недоступны',async({page,request})=>{
+  await page.goto('/');
+  await expect(page).toHaveURL(/market\.html$/);
+  await expect(page.locator('#listingGrid .listing')).toHaveCount(8);
+  for(const file of ['app.js','live.js','netlify/functions/voltguide-ai.mjs','supabase/security_patches.sql']){
+    const response=await request.get('/'+file);
+    expect(response.status(),file+' must not be served by the demo').toBe(404);
+  }
+  const config=await request.get('/config.js');
+  expect(await config.text()).toContain('supabaseUrl:""');
+  const manifest=await request.get('/build-manifest.json');
+  expect((await manifest.json()).mode).toBe('demo-only');
+});
+
+test('изолированная сборка: реальный паспорт недоступен без подключения к базе',async({page})=>{
+  await page.goto('/voltpassport.html?ad=unpublished-demo-only');
+  await expect(page.locator('#notice')).toContainText('Не удалось подключиться к VoltStore');
+  await expect(page.locator('#mainContent')).toBeHidden();
+  await expect(page.locator('script[src^="https://"]')).toHaveCount(0);
+});
+
+test('изолированная сборка: даже явный запрос AI остаётся без внешнего подключения',async({page})=>{
+  await page.goto('/voltguide.html?category=laptop');
+  await page.locator('#question').fill('Что проверить перед покупкой ноутбука?');
+  await page.locator('#consent').check();
+  await page.locator('#askAI').click();
+  await expect(page.locator('#aiResult')).toContainText('Пока недоступен вход VoltStore');
+  await expect(page.locator('script[src^="https://"]')).toHaveCount(0);
+});
 
 test('каталог: категории, поиск, фильтры и экран без горизонтального переполнения',async({page},testInfo)=>{
   const jsErrors=[];

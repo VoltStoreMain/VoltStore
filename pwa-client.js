@@ -5,7 +5,7 @@
  const secure=location.protocol==='https:'||['localhost','127.0.0.1'].includes(location.hostname);
  const inStandalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
  const $=id=>document.getElementById(id);
- let deferred=null,registration=null,reloading=false;
+ let deferred=null,registration=null,reloading=false,applyingUpdate=false;
  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||
    (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
  const banner=$('pwaInstall'),message=$('pwaMessage'),installButton=$('pwaInstallButton'),dismiss=$('pwaDismiss');
@@ -42,7 +42,7 @@
    root.hidden=false;
    const btn=root.querySelector('button');
    if(btn)btn.addEventListener('click',()=>{
-     if(registration.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});
+     if(registration.waiting){applyingUpdate=true;registration.waiting.postMessage({type:'SKIP_WAITING'});}
    },{once:true});
  }
  if(!secure||!('serviceWorker' in navigator))return;
@@ -58,7 +58,9 @@
        });
      });
      navigator.serviceWorker.addEventListener('controllerchange',()=>{
-       if(reloading)return;reloading=true;location.reload();
+       // First installation claims the tab without reloading: never discard unsaved seller forms.
+       if(!applyingUpdate||reloading)return;
+       reloading=true;location.reload();
      });
    }catch(err){ // Installing should never stop using the marketplace.
      if(location.hostname==='localhost')console.warn('VoltStore PWA worker:',err);

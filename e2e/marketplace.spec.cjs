@@ -84,6 +84,8 @@ test('черновик продавца: фото, галерея, локаль�
   await page.locator('#formNote').fill('Демонстрационный черновик без реальной публикации.');
   await page.locator('#formPhotos').setInputFiles({name:'qa-fixture.png',mimeType:'image/png',buffer:samplePng});
   await expect(page.locator('#photoPreview img')).toHaveCount(1);
+  await expect(page.locator('#formCategory')).toHaveValue('laptop');
+  await expect(page.locator('#formTitle')).toHaveValue('Ноутбук для теста VoltStore');
   await page.locator('#draftForm button[type="submit"]').click();
   await expect(page.locator('#detailView')).toBeVisible();
   await expect(page.locator('#detailTitle')).toContainText('Ноутбук для теста');
@@ -136,4 +138,16 @@ test('PWA: офлайн-каталог и кэш без параметров т�
     await page.goto('/market.html',{waitUntil:'domcontentloaded'});
     await expect(page.locator('#listingGrid .listing').first()).toBeVisible({timeout:12000});
   }finally{await context.setOffline(false);}
+});
+
+test('первое включение PWA не перезагружает незавершённую форму продавца',async({page,browserName})=>{
+  test.skip(browserName!=='chromium','Проверка первого захвата Service Worker в Chromium');
+  const navigations=[];
+  page.on('framenavigated',frame=>{if(frame===page.mainFrame())navigations.push(frame.url());});
+  await page.goto('/market.html#draft');
+  await expect(page.locator('#draftView')).toBeVisible();
+  await page.locator('#formTitle').fill('Черновик не должен исчезнуть');
+  await expect.poll(()=>page.evaluate(()=>!!navigator.serviceWorker?.controller),{timeout:25000}).toBe(true);
+  await expect(page.locator('#formTitle')).toHaveValue('Черновик не должен исчезнуть');
+  expect(navigations).toHaveLength(1);
 });
